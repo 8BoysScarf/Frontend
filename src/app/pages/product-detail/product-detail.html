@@ -1,0 +1,544 @@
+<div class="min-h-screen bg-slate-50 flex flex-col lg:flex-row"
+  [dir]="langService.currentLang() === 'ar' ? 'rtl' : 'ltr'">
+
+  <!-- Admin Sidebar (Shared Component) -->
+  @if (authService.isAdmin()) {
+  <app-admin-sidebar activeTab="products"></app-admin-sidebar>
+  }
+
+  <!-- Main Content Area -->
+  <main class="flex-1 min-h-screen bg-white overflow-y-auto flex flex-col">
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-slate-400 font-medium animate-pulse uppercase tracking-[0.2em] text-xs">{{ langService.t('productDetail.loading') }}</p>
+    </div>
+    } @else if (product() && selectedVariant()) {
+    <div class="flex-1 flex items-center justify-center px-3 sm:px-5 py-6">
+    <div class="w-full max-w-5xl">
+      <div class="grid grid-cols-1 md:grid-cols-[5fr_7fr] gap-5 lg:gap-8 items-start">
+
+        <!-- ── Image Gallery ────────────────────────────── -->
+        <div class="space-y-3 max-w-xs w-full mx-auto md:mx-0">
+          <!-- Main Image -->
+          <div
+            class="aspect-[2/3] rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 shadow-lg relative group">
+            <img [src]="activeImage()"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              [alt]="product()?.name">
+
+            <!-- Badges -->
+            @if ((product()?.badges?.length || 0) > 0) {
+            <div class="absolute top-3 start-3 flex flex-col gap-1.5">
+              @for (badge of product()?.badges; track badge) {
+              <span
+                class="bg-slate-900/85 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg">
+                {{ badge }}
+              </span>
+              }
+            </div>
+            }
+          </div>
+
+          <!-- Thumbnails -->
+          <div class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar" style="min-height:68px">
+            @for (img of selectedVariant()?.imageUrls; track img) {
+            <button (click)="changeImage(img)"
+              class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0"
+              [class.border-indigo-500]="activeImage() === img" [class.border-slate-100]="activeImage() !== img"
+              [class.opacity-50]="activeImage() !== img">
+              <img [src]="img" class="w-full h-full object-cover">
+            </button>
+            }
+          </div>
+        </div>
+
+        <!-- ── Details Panel ─────────────────────────────── -->
+        <div class="flex flex-col gap-4">
+
+          <!-- Title -->
+          <div class="flex items-start justify-between gap-4">
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">{{ product()?.name }}</h1>
+            @if (authService.isAdmin()) {
+            <button (click)="openEditProductModal()"
+              class="shrink-0 p-2 bg-slate-100 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Edit Product">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+              </svg>
+            </button>
+            }
+          </div>
+
+          <!-- Price Block -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">
+              ${{ ((selectedVariant()?.price || 0) * (1 - (selectedVariant()?.discount || 0) / 100)).toFixed(2) }}
+            </span>
+            @if ((selectedVariant()?.discount || 0) > 0) {
+            <div class="flex flex-col gap-0.5">
+              <span class="text-rose-600 font-black text-[10px] uppercase tracking-widest">{{
+                selectedVariant()?.discount }}{{ langService.t('productDetail.off') }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-300 line-through text-sm font-bold">${{ selectedVariant()?.price }}</span>
+                <span class="bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">
+                  {{ langService.t('productDetail.save') }} ${{ ((selectedVariant()?.price || 0) * ((selectedVariant()?.discount || 0) / 100)).toFixed(2) }}
+                </span>
+              </div>
+            </div>
+            }
+          </div>
+
+          <!-- Variants Section -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">{{ langService.t('productDetail.selectOption') }}</p>
+                <p class="text-sm font-black text-slate-900 uppercase tracking-tight">{{ langService.t('productDetail.variants') }}</p>
+              </div>
+              @if (authService.isAdmin()) {
+              <button (click)="openAddVariantModal()"
+                class="flex items-center gap-1.5 px-3 py-2 bg-slate-900 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                {{ langService.t('productDetail.addVariant') }}
+              </button>
+              }
+            </div>
+
+            <!-- Variant Cards -->
+            <div class="grid grid-cols-3 gap-2">
+              @for (v of product()?.variants; track v.id) {
+              <div class="relative group/variant">
+                <button (click)="selectVariant(v)"
+                  class="w-full p-2.5 sm:p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1.5 text-start"
+                  [class.border-indigo-500]="selectedVariant()?.id === v.id"
+                  [class.bg-indigo-50/40]="selectedVariant()?.id === v.id"
+                  [class.border-slate-100]="selectedVariant()?.id !== v.id"
+                  [class.hover:border-slate-200]="selectedVariant()?.id !== v.id">
+
+                  <div class="flex justify-between items-center w-full">
+                    <span class="text-xs font-black uppercase tracking-wide"
+                      [class.text-indigo-600]="selectedVariant()?.id === v.id"
+                      [class.text-slate-800]="selectedVariant()?.id !== v.id">
+                      {{ v.size }}
+                    </span>
+                    @if (v.colorHex) {
+                    <div class="w-4 h-4 rounded-md border border-white shadow ring-1 ring-slate-100"
+                      [style.backgroundColor]="v.colorHex"></div>
+                    }
+                  </div>
+                  <p class="text-[8px] font-black uppercase tracking-widest truncate w-full"
+                    [class.text-indigo-400]="selectedVariant()?.id === v.id"
+                    [class.text-slate-400]="selectedVariant()?.id !== v.id">
+                    {{ v.colorName || langService.t('productDetail.default') }}
+                  </p>
+                  <p class="text-sm font-black tracking-tighter"
+                    [class.text-indigo-600]="selectedVariant()?.id === v.id"
+                    [class.text-slate-900]="selectedVariant()?.id !== v.id">
+                    ${{ (v.price * (1 - (v.discount || 0) / 100)).toFixed(0) }}
+                  </p>
+                </button>
+
+                @if (authService.isAdmin()) {
+                <div class="absolute -top-1.5 -end-1.5 flex flex-col gap-1 z-10 opacity-0 group-hover/variant:opacity-100 transition-all">
+                  <button (click)="$event.stopPropagation(); openEditVariantModal(v)"
+                    class="w-6 h-6 bg-white border border-slate-100 rounded-full text-slate-300 hover:text-indigo-500 shadow-sm flex items-center justify-center">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                  </button>
+                  <button (click)="$event.stopPropagation(); onDeleteVariant(v.id)"
+                    class="w-6 h-6 bg-white border border-slate-100 rounded-full text-slate-300 hover:text-rose-500 shadow-sm flex items-center justify-center">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+                }
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Customer Actions -->
+          @if (!authService.isAdmin()) {
+          <div class="flex items-center gap-4 mt-2">
+            <button
+              class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              {{ langService.t('productDetail.addToCart') || 'Add to Cart' }}
+            </button>
+            <button
+              class="w-14 h-14 shrink-0 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center hover:bg-rose-500 hover:text-white hover:-translate-y-1 transition-all shadow-md">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            </button>
+          </div>
+          }
+
+          <!-- Description -->
+          <div class="border-t border-slate-100 pt-3">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.description') }}</p>
+            <p class="text-slate-600 text-sm leading-relaxed">{{ product()?.description || langService.t('productDetail.noDescription') }}</p>
+          </div>
+
+          <!-- Metadata row -->
+          <div class="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
+            <!-- Stock -->
+            <div class="flex items-center gap-2 bg-slate-50 rounded-xl p-2.5">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                [class]="(selectedVariant()?.stockQuantity || 0) > 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ langService.t('productDetail.stock') }}</p>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <div class="w-1.5 h-1.5 rounded-full shrink-0"
+                    [class]="(selectedVariant()?.stockQuantity || 0) > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'">
+                  </div>
+                  <p class="text-xs font-black text-slate-900 truncate">
+                    {{ (selectedVariant()?.stockQuantity || 0) > 0 ? selectedVariant()?.stockQuantity + ' ' + langService.t('productDetail.units') : langService.t('productDetail.outOfStock') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Code -->
+            <div class="flex items-center gap-2 bg-slate-50 rounded-xl p-2.5">
+              <div class="w-7 h-7 rounded-lg bg-slate-200 text-slate-500 flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ langService.t('productDetail.code') }}</p>
+                <p class="text-xs font-black text-slate-900 truncate mt-0.5">{{ selectedVariant()?.code }}</p>
+              </div>
+            </div>
+
+            <!-- Category -->
+            <div class="flex items-center gap-2 bg-indigo-50 rounded-xl p-2.5">
+              <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ langService.t('productDetail.category') }}</p>
+                <p class="text-xs font-black text-slate-900 truncate mt-0.5">{{ product()?.categoryName || langService.t('productDetail.general') }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </div>
+    } @else {
+    <div class="flex flex-col items-center justify-center min-h-[70vh] p-8 text-center">
+      <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mb-6">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-black text-slate-900 mb-2">{{ langService.t('productDetail.notFound') }}</h2>
+      <p class="text-slate-400 mb-8 max-w-xs">{{ langService.t('productDetail.notFoundDesc') }}</p>
+      <button (click)="goBack()"
+        class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all">
+        {{ langService.t('productDetail.goBack') }}
+      </button>
+    </div>
+    }
+
+    <!-- Add Variant Modal -->
+    @if (showAddVariantModal()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+        (click)="showAddVariantModal.set(false)"></div>
+      <div
+        class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-zoom-in max-h-[90vh] flex flex-col">
+        <div class="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 uppercase tracking-widest">{{ variantForm.get('id')?.value ? langService.t('productDetail.editVariant') : langService.t('productDetail.addVariantTitle') }}</h2>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{{ langService.t('productDetail.configureStock') }} {{ product()?.name }}</p>
+          </div>
+          <button (click)="showAddVariantModal.set(false)"
+            class="text-slate-400 hover:text-slate-900 transition-colors p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+          <form [formGroup]="variantForm" (ngSubmit)="onSubmitVariant()" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.size') }}</label>
+                <input type="text" formControlName="size" [placeholder]="langService.t('productDetail.sizePlaceholder')"
+                  class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.internalCode') }}</label>
+                <input type="text" formControlName="code" placeholder="v-001"
+                  class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.inventoryStock') }}</label>
+                <input type="number" formControlName="stockQuantity"
+                  class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.existingColor') }}</label>
+                <select formControlName="colorId"
+                  class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-white">
+                  <option [ngValue]="null">{{ langService.t('productDetail.selectColor') }}</option>
+                  @for (c of colors(); track c.id) {
+                  <option [ngValue]="c.id" [style.color]="c.hexCode" class="font-bold">
+                    ⬤ {{ c.name }} ({{ c.hexCode }})
+                  </option>
+                  }
+                </select>
+              </div>
+
+              @if (!variantForm.get('colorId')?.value) {
+                <div class="sm:col-span-2 grid grid-cols-2 gap-4 animate-fade-in">
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.newColorName') }}</label>
+                    <input type="text" formControlName="colorName" placeholder="e.g. Lime"
+                      class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.newColorHex') }}</label>
+                    <input type="text" formControlName="hexCode" placeholder="#00FF00"
+                      class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+                  </div>
+                </div>
+              }
+
+              <div class="bg-indigo-50/30 p-4 rounded-2xl grid grid-cols-3 gap-4 sm:col-span-2 border border-indigo-50">
+                <div>
+                  <label class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.realPrice') }}</label>
+                  <input type="number" formControlName="realPrice" class="w-full border border-slate-200 rounded-xl px-3 py-3 focus:border-indigo-500 outline-none bg-white text-sm">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.salePrice') }}</label>
+                  <input type="number" formControlName="price" class="w-full border border-slate-200 rounded-xl px-3 py-3 focus:border-indigo-500 outline-none bg-white text-sm">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.discount') }}</label>
+                  <input type="number" formControlName="discount" placeholder="0" class="w-full border border-slate-200 rounded-xl px-3 py-3 focus:border-indigo-500 outline-none bg-white text-sm">
+                </div>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('productDetail.variantImages') }}</label>
+                <input type="file" multiple (change)="onFileSelected($event)"
+                  class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer transition-all">
+              </div>
+            </div>
+
+            <div class="pt-4 sticky bottom-0 bg-white pb-2">
+              <button type="submit" [disabled]="variantForm.invalid || isSubmitting()"
+                class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                @if (isSubmitting()) {
+                <div class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                {{ langService.t('productDetail.deploying') }}
+                } @else {
+                {{ variantForm.get('id')?.value ? langService.t('productDetail.updateVariant') : langService.t('productDetail.deployVariant') }}
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Notification Toast -->
+    @if (notification()) {
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] animate-slide-up">
+      <div
+        class="flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border border-white/20 min-w-[320px]"
+        [class.bg-emerald-500/90]="notification()?.type === 'success'"
+        [class.bg-rose-500/90]="notification()?.type === 'error'"
+        [class.bg-slate-900/90]="notification()?.type === 'info'">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+          @if (notification()?.type === 'success') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          } @else if (notification()?.type === 'error') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          } @else {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          }
+        </div>
+        <p class="text-white font-bold text-sm tracking-wide">{{ notification()?.message }}</p>
+      </div>
+    </div>
+    }
+
+    <!-- Confirmation Popup -->
+    @if (confirmation()) {
+    <div class="fixed inset-0 z-[150] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-fade-in" (click)="confirmation.set(null)">
+      </div>
+      <div
+        class="relative bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden animate-zoom-in p-8 text-center">
+        <div class="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-6">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+            </path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-black text-slate-900 mb-2">{{ langService.t('productDetail.confirmDelete') }}</h3>
+        <p class="text-slate-500 text-sm mb-8 leading-relaxed">{{ confirmation()?.message }}</p>
+        <div class="flex gap-4">
+          <button (click)="confirmation.set(null)"
+            class="flex-1 px-6 py-4 rounded-xl bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">
+            {{ langService.t('productDetail.cancel') }}
+          </button>
+          <button (click)="confirmation()?.action()"
+            class="flex-1 px-6 py-4 rounded-xl bg-rose-600 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-rose-600/20 hover:bg-rose-700 transition-all">
+            {{ langService.t('productDetail.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Edit Product Modal -->
+    @if (showEditProductModal()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+        (click)="showEditProductModal.set(false)"></div>
+      <div class="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-zoom-in max-h-[90vh] flex flex-col">
+        <div class="p-6 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 uppercase tracking-widest">{{ langService.t('admin.header.editProduct') || 'Edit Product' }}</h2>
+          </div>
+          <button (click)="showEditProductModal.set(false)" class="text-slate-400 hover:text-slate-900 transition-colors p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+          <form [formGroup]="productEditForm" (ngSubmit)="onSubmitProductEdit()" class="space-y-6">
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('admin.header.unitName') || 'Product Name' }}</label>
+              <input type="text" formControlName="name" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('admin.header.description') || 'Description' }}</label>
+              <textarea formControlName="description" rows="3" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50 resize-none"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('admin.header.category') || 'Category' }}</label>
+              <select formControlName="categoryId" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-white">
+                <option [ngValue]="null">Select Category</option>
+                @for (cat of categories(); track cat.id) {
+                <option [ngValue]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="pt-4 sticky bottom-0 bg-white pb-2">
+              <button type="submit" [disabled]="productEditForm.invalid || isSubmitting()"
+                class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                @if (isSubmitting()) {
+                <div class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                Processing...
+                } @else {
+                Update Product
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    }
+  </main>
+</div>
+
+<style>
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes zoom-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 100%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+
+  .animate-zoom-in {
+    animation: zoom-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f8fafc;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+</style>

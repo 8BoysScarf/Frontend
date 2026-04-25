@@ -1,0 +1,254 @@
+<div class="min-h-screen bg-slate-50 overflow-x-hidden">
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-2 group cursor-pointer">
+          <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform duration-300">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+          </div>
+          <span
+            class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+            {{ langService.t('home.storeName') }}
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+          <a href="#" class="hover:text-indigo-600 transition-colors relative group">
+            {{ langService.t('nav.newArrivals') }}
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+          </a>
+          <a href="#" class="hover:text-indigo-600 transition-colors relative group">
+            {{ langService.t('nav.categories') }}
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+          </a>
+          <a href="#" class="hover:text-indigo-600 transition-colors relative group">
+            {{ langService.t('nav.offers') }}
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <!-- Language Switcher -->
+          <button (click)="langService.toggleLang()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all uppercase">
+            {{ langService.currentLang() === 'ar' ? 'En' : 'ع' }}
+          </button>
+
+          @if (!authService.currentUser()) {
+          <a routerLink="/login" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">{{
+            langService.t('nav.login') }}</a>
+          <a routerLink="/register"
+            class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-full hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition-all active:scale-95 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            {{ langService.t('nav.signup') }}
+          </a>
+          } @else {
+          <div class="flex items-center gap-3">
+            <div class="text-right hidden sm:block">
+              <p class="text-sm font-bold text-slate-900">{{ authService.currentUser()?.name || authService.currentUser()?.username }}</p>
+              <button (click)="onLogout()" class="text-xs font-medium text-slate-500 hover:text-red-600 transition-colors">{{ langService.t('nav.logout') }}</button>
+            </div>
+            <div class="w-10 h-10 rounded-full border-2 border-indigo-600 p-0.5 shadow-md overflow-hidden bg-slate-200 hover:scale-110 transition-transform cursor-pointer">
+              <img [src]="authService.currentUser()?.profilePic || 'https://ui-avatars.com/api/?name=' + (authService.currentUser()?.name || 'User')" 
+                   class="w-full h-full object-cover rounded-full">
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32 bg-white">
+    <!-- Animated background patterns -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-100 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-violet-100 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+        <div class="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 animate-fade-in-up"
+          [class.lg:text-left]="langService.currentLang() === 'en'"
+          [class.lg:text-right]="langService.currentLang() === 'ar'">
+          <span
+            class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mb-6 shadow-sm border border-indigo-200/50">
+            {{ langService.t('hero.badge') }}
+          </span>
+          <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl"
+            [innerHTML]="langService.t('hero.title')"></h1>
+          <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-xl" [class.mx-auto]="langService.currentLang() === 'ar'">
+            {{ langService.t('hero.desc') }}
+          </p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-4 sm:justify-center lg:justify-start">
+            <button
+              class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-2xl shadow-indigo-100 hover:bg-indigo-700 hover:-translate-y-1 hover:shadow-indigo-300 transition-all active:scale-95">
+              {{ langService.t('hero.shopNow') }}
+            </button>
+            <button
+              class="px-8 py-4 bg-white text-slate-900 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 hover:-translate-y-1 transition-all active:scale-95">
+              {{ langService.t('hero.viewCatalog') }}
+            </button>
+          </div>
+          <div class="mt-10 flex items-center gap-6 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700 sm:justify-center lg:justify-start">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{
+              langService.t('hero.trustedBy') }}</span>
+            <div class="flex gap-8 items-center">
+              <span class="font-bold text-lg hover:text-indigo-600 cursor-default transition-colors">LUXE</span>
+              <span class="font-bold text-lg hover:text-indigo-600 cursor-default transition-colors">MODE</span>
+              <span class="font-bold text-lg hover:text-indigo-600 cursor-default transition-colors">TRENDY</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-16 lg:mt-0 lg:col-span-6 relative">
+          <div class="relative mx-auto w-full max-w-lg lg:max-w-none animate-float">
+            <div
+              class="relative rounded-[2.5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(79,70,229,0.3)] rotate-2 hover:rotate-0 transition-transform duration-700 cursor-pointer group aspect-[4/5] bg-slate-100">
+              
+              @for (img of heroImages(); track img; let i = $index) {
+              <img [src]="img"
+                alt="Hero Product" 
+                class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000"
+                [class.opacity-100]="i === activeImageIndex()"
+                [class.opacity-0]="i !== activeImageIndex()"
+                [class.z-10]="i === activeImageIndex()"
+                [class.z-0]="i !== activeImageIndex()">
+              }
+
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity z-20"></div>
+              <div class="absolute bottom-10 start-10 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 z-30">
+                <p class="text-sm font-medium opacity-80 uppercase tracking-widest mb-2">{{
+                  langService.t('home.featuredItem') }}</p>
+                <p class="text-3xl font-bold">{{ langService.t('home.coatName') }}</p>
+              </div>
+            </div>
+            <!-- Decorative Elements -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-100 rounded-full blur-3xl -z-10"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-100 rounded-full blur-3xl -z-10"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Featured Categories -->
+  <section class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-end justify-between mb-16 animate-fade-in-up">
+      <div>
+        <h2 class="text-4xl font-bold text-slate-900">{{ langService.t('home.collections') }}</h2>
+        <p class="text-slate-500 mt-4 text-lg">{{ langService.t('home.collectionsDesc') }}</p>
+      </div>
+      <a href="#" class="text-indigo-600 font-bold text-sm hover:translate-x-2 transition-transform inline-flex items-center gap-2">
+        {{ langService.t('home.viewAll') }}
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div class="group relative h-[30rem] rounded-[2rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-indigo-200/50 transition-all duration-500 animate-fade-in-up" style="animation-delay: 0.1s">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070&auto=format&fit=crop"
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-10 start-10 transform group-hover:-translate-y-2 transition-transform duration-500">
+          <h3 class="text-3xl font-bold text-white">{{ langService.t('home.footwear') }}</h3>
+          <p class="text-slate-200 text-sm mt-2 font-medium opacity-0 group-hover:opacity-100 transition-opacity">420+ {{ langService.t('home.items') }}</p>
+        </div>
+      </div>
+      <div class="group relative h-[30rem] rounded-[2rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-indigo-200/50 transition-all duration-500 md:translate-y-8 animate-fade-in-up" style="animation-delay: 0.2s">
+        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2070&auto=format&fit=crop"
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-10 start-10 transform group-hover:-translate-y-2 transition-transform duration-500">
+          <h3 class="text-3xl font-bold text-white">{{ langService.t('home.accessories') }}</h3>
+          <p class="text-slate-200 text-sm mt-2 font-medium opacity-0 group-hover:opacity-100 transition-opacity">150+ {{ langService.t('home.items') }}</p>
+        </div>
+      </div>
+      <div class="group relative h-[30rem] rounded-[2rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-indigo-200/50 transition-all duration-500 animate-fade-in-up" style="animation-delay: 0.3s">
+        <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=1915&auto=format&fit=crop"
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-10 start-10 transform group-hover:-translate-y-2 transition-transform duration-500">
+          <h3 class="text-3xl font-bold text-white">{{ langService.t('home.streetwear') }}</h3>
+          <p class="text-slate-200 text-sm mt-2 font-medium opacity-0 group-hover:opacity-100 transition-opacity">890+ {{ langService.t('home.items') }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="py-24 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between mb-16 animate-fade-in-up">
+        <div>
+          <h2 class="text-4xl font-bold text-slate-900">{{ langService.t('home.newArrivals') || 'New Arrivals' }}</h2>
+          <p class="text-slate-500 mt-4 text-lg">{{ langService.t('home.newArrivalsDesc') || 'Discover the latest additions to our collection.' }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        @for (product of featuredProducts(); track product.id) {
+        <div class="group relative bg-white rounded-3xl p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 border border-slate-100">
+          <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 mb-6">
+            <img [src]="product.thumbnailUrl || 'https://placehold.co/400x500'" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="px-2">
+            <p class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-2">{{ product.categoryName }}</p>
+            <h3 class="text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors mb-4 line-clamp-1">
+              <a [routerLink]="['/product', product.id]">
+                <span class="absolute inset-0"></span>
+                {{ product.name }}
+              </a>
+            </h3>
+            <div class="flex items-center justify-between">
+              <p class="text-xl font-black text-slate-900">${{ product.price }}</p>
+              <button class="relative z-10 w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="bg-indigo-900 py-24 mt-20 overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 animate-fade-in-up">
+      <h2 class="text-4xl font-bold text-white">{{ langService.t('home.newsletterTitle') }}</h2>
+      <p class="text-indigo-200 mt-6 max-w-xl mx-auto text-lg">{{ langService.t('home.newsletterDesc') }}</p>
+      <form class="mt-12 max-w-lg mx-auto flex flex-col sm:flex-row gap-4 p-2 bg-white/10 rounded-3xl backdrop-blur-md border border-white/20 shadow-2xl">
+        <input type="email" [placeholder]="langService.t('home.emailPlaceholder')"
+          class="flex-1 bg-transparent px-6 py-4 text-white placeholder-white/50 focus:outline-none focus:ring-0">
+        <button
+          class="bg-white text-indigo-900 px-8 py-4 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-95 whitespace-nowrap shadow-xl">
+          {{ langService.t('home.subscribe') }}
+        </button>
+      </form>
+    </div>
+    <!-- Background Decor -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+  </section>
+
+  <footer class="bg-white py-16 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                </div>
+                <span class="text-lg font-bold text-slate-900 tracking-tight">{{ langService.t('home.storeName') }}</span>
+            </div>
+            <div class="flex gap-10 text-sm font-medium text-slate-500">
+                <a href="#" class="hover:text-indigo-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors">Shipping</a>
+            </div>
+            <p class="text-slate-400 text-sm">&copy; 2026 {{ langService.t('home.storeName') }}. {{ langService.t('home.rights') }}</p>
+        </div>
+    </div>
+  </footer>
+</div>
