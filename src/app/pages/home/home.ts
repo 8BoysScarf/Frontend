@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth';
 import { LanguageService } from '../../services/language';
 import { ProductImageService } from '../../services/product-image';
 import { ProductService, Product } from '../../services/product';
+import { CartService } from '../../services/cart';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -18,6 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   langService = inject(LanguageService);
   productImageService = inject(ProductImageService);
   productService = inject(ProductService);
+  cartService = inject(CartService);
 
   heroImages = signal<string[]>([]);
   featuredProducts = signal<Product[]>([]);

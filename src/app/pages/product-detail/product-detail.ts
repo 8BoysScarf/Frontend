@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth';
 import { VariantService } from '../../services/variant';
 import { ColorService, Color } from '../../services/color';
 import { CategoryService, Category } from '../../services/category';
+import { CartService } from '../../services/cart';
 import { Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
@@ -298,7 +299,40 @@ export class ProductDetailComponent implements OnInit {
     this.activeImage.set(url);
   }
 
+  public cartService = inject(CartService);
+
+  addToCart() {
+    const variant = this.selectedVariant();
+    if (!variant) return;
+    
+    if (variant.stockQuantity <= 0) {
+      this.showNotify(this.langService.t('productDetail.soldOut') || 'Out of stock', 'error');
+      return;
+    }
+
+    if (!this.authService.currentUser()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.cartService.addItem({ productVariantId: variant.id, quantity: 1 }).subscribe({
+      next: () => {
+        this.showNotify(this.langService.t('cart.addSuccess') || 'Added to cart successfully', 'success');
+        this.isSubmitting.set(false);
+      },
+      error: (err) => {
+        this.showNotify(this.getErrorMessage(err, 'Failed to add to cart'), 'error');
+        this.isSubmitting.set(false);
+      }
+    });
+  }
+
   goBack() {
     this.location.back();
+  }
+
+  onLogout() {
+    this.authService.logout();
   }
 }

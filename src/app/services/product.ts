@@ -11,6 +11,9 @@ export interface Product {
   thumbnailUrl: string;
   badges: string[];
   stockQuantity: number;
+  size?: string;
+  discount?: number;
+  hexCode?: string;
   description?: string;
 }
 

@@ -10,12 +10,77 @@ export class LanguageService {
   translations: any = {
     ar: {
       nav: {
+        home: 'الرئيسية',
         newArrivals: 'وصلنا حديثاً',
         categories: 'الفئات',
         offers: 'العروض',
         login: 'تسجيل الدخول',
         signup: 'إنشاء حساب',
-        logout: 'تسجيل الخروج'
+        logout: 'تسجيل الخروج',
+        addresses: 'عناويني',
+        cart: 'السلة',
+        orders: 'طلباتي'
+      },
+      orders: {
+        title: 'طلباتي',
+        details: 'تفاصيل الطلب',
+        orderId: 'رقم الطلب',
+        items: 'المنتجات',
+        emptyTitle: 'لا توجد طلبات بعد',
+        emptyDesc: 'لم تقم بإجراء أي طلبات حتى الآن. ابدأ التسوق الآن!',
+        backToList: 'العودة لقائمة طلباتي'
+      },
+      cart: {
+        title: 'سلة المشتريات',
+        addSuccess: 'تمت إضافة المنتج إلى السلة بنجاح',
+        removeError: 'فشل في إزالة المنتج',
+        selectAddress: 'يرجى اختيار عنوان التوصيل',
+        checkoutSuccess: 'تم إرسال الطلب بنجاح!',
+        checkoutError: 'فشل في إتمام الطلب',
+        qty: 'الكمية:',
+        summary: 'ملخص الطلب',
+        subtotal: 'المجموع الفرعي',
+        shipping: 'الشحن',
+        free: 'مجاني',
+        total: 'الإجمالي',
+        deliveryAddress: 'عنوان التوصيل',
+        noAddress: 'يرجى إضافة عنوان توصيل أولاً.',
+        addAddress: 'إضافة عنوان',
+        checkout: 'إتمام الطلب',
+        emptyTitle: 'سلتك فارغة',
+        emptyDesc: 'يبدو أنك لم تقم بإضافة أي منتجات إلى سلتك بعد.',
+        continue: 'مواصلة التسوق'
+      },
+      addresses: {
+        title: 'عناويني',
+        desc: 'إدارة عناوين التوصيل الخاصة بك.',
+        addNew: 'إضافة عنوان جديد',
+        loadError: 'فشل في تحميل العناوين',
+        updateSuccess: 'تم تحديث العنوان بنجاح',
+        updateError: 'فشل في تحديث العنوان',
+        addSuccess: 'تمت إضافة العنوان بنجاح',
+        addError: 'فشل في إضافة العنوان',
+        deleteSuccess: 'تم حذف العنوان بنجاح',
+        deleteError: 'فشل في حذف العنوان',
+        defaultSuccess: 'تم تعيين العنوان الافتراضي',
+        defaultError: 'فشل في تعيين العنوان الافتراضي',
+        setAsDefault: 'تعيين كافتراضي',
+        default: 'الافتراضي',
+        emptyTitle: 'لا توجد عناوين',
+        emptyDesc: 'لم تقم بإضافة أي عناوين للتوصيل بعد.',
+        editTitle: 'تعديل العنوان',
+        addTitle: 'إضافة عنوان',
+        city: 'المدينة',
+        cityPlaceholder: 'مثال: الرياض',
+        street: 'الشارع والتفاصيل',
+        streetPlaceholder: 'مثال: طريق الملك فهد، مبنى 12',
+        save: 'حفظ التغييرات',
+        create: 'إضافة العنوان'
+      },
+      footer: {
+        privacy: 'سياسة الخصوصية',
+        terms: 'الشروط والأحكام',
+        shipping: 'سياسة الشحن'
       },
       hero: {
         badge: '🚀 مجموعة صيف 2026 الجديدة',
@@ -148,7 +213,9 @@ export class LanguageService {
           cancel: 'إلغاء',
           confirm: 'تأكيد',
           confirmOp: 'تأكيد العملية',
-          add: 'إضافة'
+          add: 'إضافة',
+          editProduct: 'تعديل المنتج',
+          updateProduct: 'تحديث المنتج'
         },
         stats: {
           products: 'إجمالي المنتجات',
@@ -218,6 +285,7 @@ export class LanguageService {
         save: 'وفّر',
         units: 'قطعة',
         outOfStock: 'نفد',
+        addToCart: 'أضف إلى السلة',
         general: 'عام',
         notFound: 'المنتج غير موجود',
         notFoundDesc: 'المنتج الذي تبحث عنه غير متوفر أو تم نقله.',
@@ -248,12 +316,77 @@ export class LanguageService {
     },
     en: {
       nav: {
+        home: 'Home',
         newArrivals: 'New Arrivals',
         categories: 'Categories',
         offers: 'Offers',
         login: 'Login',
         signup: 'Sign Up',
-        logout: 'Logout'
+        logout: 'Logout',
+        addresses: 'My Addresses',
+        cart: 'Cart',
+        orders: 'My Orders'
+      },
+      orders: {
+        title: 'My Orders',
+        details: 'Order Details',
+        orderId: 'Order ID',
+        items: 'Order Items',
+        emptyTitle: 'No Orders Yet',
+        emptyDesc: 'You haven\'t placed any orders yet. Start shopping now!',
+        backToList: 'Back to My Orders'
+      },
+      cart: {
+        title: 'Shopping Cart',
+        addSuccess: 'Product added to cart successfully',
+        removeError: 'Failed to remove item',
+        selectAddress: 'Please select a delivery address',
+        checkoutSuccess: 'Order placed successfully!',
+        checkoutError: 'Failed to place order',
+        qty: 'Qty:',
+        summary: 'Order Summary',
+        subtotal: 'Subtotal',
+        shipping: 'Shipping',
+        free: 'Free',
+        total: 'Total',
+        deliveryAddress: 'Delivery Address',
+        noAddress: 'Please add a delivery address first.',
+        addAddress: 'Add Address',
+        checkout: 'Place Order',
+        emptyTitle: 'Your Cart is Empty',
+        emptyDesc: 'Looks like you haven\'t added any items to your cart yet.',
+        continue: 'Continue Shopping'
+      },
+      addresses: {
+        title: 'My Addresses',
+        desc: 'Manage your delivery addresses.',
+        addNew: 'Add New Address',
+        loadError: 'Failed to load addresses',
+        updateSuccess: 'Address updated successfully',
+        updateError: 'Failed to update address',
+        addSuccess: 'Address added successfully',
+        addError: 'Failed to add address',
+        deleteSuccess: 'Address deleted successfully',
+        deleteError: 'Failed to delete address',
+        defaultSuccess: 'Default address set',
+        defaultError: 'Failed to set default address',
+        setAsDefault: 'Set as Default',
+        default: 'Default',
+        emptyTitle: 'No Addresses Found',
+        emptyDesc: 'You haven\'t added any delivery addresses yet.',
+        editTitle: 'Edit Address',
+        addTitle: 'Add Address',
+        city: 'City',
+        cityPlaceholder: 'e.g. Riyadh',
+        street: 'Street & Details',
+        streetPlaceholder: 'e.g. King Fahad Road, Building 12',
+        save: 'Save Changes',
+        create: 'Create Address'
+      },
+      footer: {
+        privacy: 'Privacy',
+        terms: 'Terms',
+        shipping: 'Shipping'
       },
       hero: {
         badge: '🚀 New Summer Collection 2026',
@@ -386,7 +519,9 @@ export class LanguageService {
           cancel: 'Cancel',
           confirm: 'Confirm',
           confirmOp: 'Confirm Operation',
-          add: 'Add'
+          add: 'Add',
+          editProduct: 'Edit Product',
+          updateProduct: 'Update Product'
         },
         stats: {
           products: 'Total Products',
@@ -456,6 +591,7 @@ export class LanguageService {
         save: 'Save',
         units: 'units',
         outOfStock: 'Out',
+        addToCart: 'Add to Cart',
         general: 'General',
         notFound: 'Product Not Found',
         notFoundDesc: 'The product you are looking for has been moved or is unavailable.',
