@@ -31,7 +31,7 @@ export interface OrderSummaryDTO {
 export class OrderService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private baseUrl = 'https://localhost:7264/api/Order';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Order';
 
   private getHeaders() {
     const user = this.authService.currentUser();

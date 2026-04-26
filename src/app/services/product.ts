@@ -46,7 +46,7 @@ export interface ProductDetails {
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/Product';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Product';
 
   getProducts(): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl);

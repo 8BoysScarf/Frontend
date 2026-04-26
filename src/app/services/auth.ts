@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/Auth';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Auth';
   
   // Current user signal
   currentUser = signal<any>(this.getUserFromStorage());

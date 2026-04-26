@@ -29,7 +29,7 @@ export interface UpdateAddressDTO {
 export class AddressService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private baseUrl = 'https://localhost:7264/api/Address';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Address';
 
   private getHeaders() {
     const user = this.authService.currentUser();

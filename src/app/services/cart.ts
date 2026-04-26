@@ -35,7 +35,7 @@ export interface CheckoutDTO {
 export class CartService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private baseUrl = 'https://localhost:7264/api/Cart';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Cart';
 
   cartItemCount = signal<number>(0);
 

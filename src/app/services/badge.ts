@@ -21,7 +21,7 @@ export interface UpdateBadgeDTO {
 })
 export class BadgeService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/Badge';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Badge';
 
   getBadges(): Observable<Badge[]> {
     return this.http.get<Badge[]>(this.baseUrl);

@@ -20,7 +20,7 @@ export interface AddVariantDTO {
 })
 export class VariantService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/ProductVariant';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/ProductVariant';
 
   getVariant(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/${id}`);

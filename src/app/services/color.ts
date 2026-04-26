@@ -24,7 +24,7 @@ export interface UpdateColorDTO {
 })
 export class ColorService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/Color';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Color';
 
   getColors(): Observable<Color[]> {
     return this.http.get<Color[]>(this.baseUrl);

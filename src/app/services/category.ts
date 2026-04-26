@@ -25,7 +25,7 @@ export interface UpdateCategoryDTO {
 })
 export class CategoryService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/Category';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/Category';
 
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}/GetAllNames`);

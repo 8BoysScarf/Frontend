@@ -12,7 +12,7 @@ export interface ProductImageDTO {
 })
 export class ProductImageService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:7264/api/ProductImage';
+  private baseUrl = 'https://8boysscarf.runasp.net/api/ProductImage';
 
   getAllImages(): Observable<ProductImageDTO[]> {
     return this.http.get<ProductImageDTO[]>(this.baseUrl);
