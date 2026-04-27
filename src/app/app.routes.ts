@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'admin', component: DashboardComponent, canActivate: [adminGuard] },
   { path: 'addresses', loadComponent: () => import('./pages/addresses/addresses').then(m => m.AddressesComponent), canActivate: [authGuard, customerGuard] },
   { path: 'cart', loadComponent: () => import('./pages/cart/cart').then(m => m.CartComponent), canActivate: [authGuard, customerGuard] },
+  { path: 'wishlist', loadComponent: () => import('./pages/wishlist/wishlist').then(m => m.WishlistComponent), canActivate: [authGuard, customerGuard] },
   { path: 'orders', loadComponent: () => import('./pages/orders/orders').then(m => m.OrdersComponent), canActivate: [authGuard, customerGuard] },
   { path: 'order/:id', loadComponent: () => import('./pages/order-details/order-details').then(m => m.OrderDetailsComponent), canActivate: [authGuard, customerGuard] },
   { path: 'product/:id', loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent) },

@@ -4,11 +4,12 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { OrderService, OrderDetailsDTO } from '../../services/order';
 import { LanguageService } from '../../services/language';
 import { Location } from '@angular/common';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-order-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavbarComponent],
   templateUrl: './order-details.html'
 })
 export class OrderDetailsComponent implements OnInit {

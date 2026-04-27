@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-slate-50 overflow-x-hidden">
+  <!-- Navigation -->
+  <app-navbar mode="simple"></app-navbar>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="mb-12 animate-fade-in-up">
+      <h1 class="text-4xl font-extrabold text-slate-900">{{ langService.t('wishlist.title') || 'Your Favorites' }}</h1>
+      <p class="text-slate-500 mt-2 text-lg">{{ langService.t('wishlist.subtitle') || 'Products you have saved for later.' }}</p>
+    </div>
+
+    <!-- Notification -->
+    @if (notification()) {
+      <div class="fixed top-20 right-4 z-[100] animate-fade-in-right">
+        <div [class]="'px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md border flex items-center gap-4 ' + 
+          (notification()?.type === 'success' ? 'bg-emerald-500/90 text-white border-emerald-400' : 'bg-rose-500/90 text-white border-rose-400')">
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            @if (notification()?.type === 'success') {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            }
+          </div>
+          <p class="font-bold">{{ notification()?.message }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="bg-white rounded-3xl p-4 animate-pulse">
+            <div class="w-full aspect-[4/5] rounded-2xl bg-slate-200 mb-4"></div>
+            <div class="h-4 bg-slate-200 rounded w-2/3 mb-2"></div>
+            <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      @if (wishlistProducts().length === 0) {
+        <div class="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div class="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mb-6 text-rose-500">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900">{{ langService.t('wishlist.empty') || 'Your wishlist is empty' }}</h2>
+          <p class="text-slate-500 mt-2 mb-8 text-center max-w-xs">{{ langService.t('wishlist.emptyDesc') || 'Explore our collection and add items to your favorites.' }}</p>
+          <a routerLink="/" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95">
+            {{ langService.t('wishlist.explore') || 'Start Shopping' }}
+          </a>
+        </div>
+      } @else {
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          @for (product of wishlistProducts(); track product.id) {
+            <div class="group relative bg-white rounded-3xl p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 border border-slate-100 flex flex-col h-full animate-fade-in-up">
+              <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 mb-6">
+                <img [src]="product.thumbnailUrl || 'https://placehold.co/400x500'" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                
+                <button (click)="removeFromWishlist(product.id, $event)" class="absolute top-3 right-3 z-30 w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 group/remove">
+                  <svg class="w-5 h-5 text-rose-500 fill-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+
+                @if (product.stockQuantity <= 0) {
+                  <div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10">
+                    <span class="px-4 py-2 bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg transform -rotate-12">
+                      {{ langService.t('productDetail.soldOut') }}
+                    </span>
+                  </div>
+                }
+              </div>
+              <div class="px-2 flex-1 flex flex-col">
+                <p class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-2">{{ product.categoryName }}</p>
+                <h3 class="text-lg font-bold text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors mb-4 line-clamp-2">
+                  <a [routerLink]="['/product', product.id]">
+                    <span class="absolute inset-0 z-20"></span>
+                    {{ product.name }}
+                  </a>
+                </h3>
+                <div class="mt-auto flex items-center justify-between">
+                  <p class="text-xl font-black text-slate-900">${{ product.price }}</p>
+                  <button [routerLink]="['/product', product.id]" class="relative z-30 px-4 py-2 bg-slate-50 text-slate-900 text-xs font-bold rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                    {{ langService.t('wishlist.view') || 'View' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </main>
+</div>

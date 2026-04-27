@@ -8,14 +8,16 @@ import { VariantService } from '../../services/variant';
 import { ColorService, Color } from '../../services/color';
 import { CategoryService, Category } from '../../services/category';
 import { CartService } from '../../services/cart';
+import { WishlistService } from '../../services/wishlist';
 import { Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, AdminSidebarComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, AdminSidebarComponent, NavbarComponent],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.css'
 })
@@ -30,6 +32,7 @@ export class ProductDetailComponent implements OnInit {
   public authService = inject(AuthService);
   private location = inject(Location);
   private fb = inject(FormBuilder);
+  public wishlistService = inject(WishlistService);
 
   product = signal<ProductDetails | null>(null);
   selectedVariant = signal<ProductVariant | null>(null);
@@ -95,7 +98,7 @@ export class ProductDetailComponent implements OnInit {
 
   getErrorMessage(err: any, defaultMsg: string): string {
     if (!err) return defaultMsg;
-    
+
     // If backend returns a plain string containing the message
     if (typeof err.error === 'string') {
       // Sometimes ASP.NET returns raw text with exception type: "System.Exception: Message here \n stack trace..."
@@ -112,13 +115,13 @@ export class ProductDetailComponent implements OnInit {
       if (err.error.message) return err.error.message;
       if (err.error.detail) return err.error.detail;
       if (err.error.title) return err.error.title;
-      
+
       // Sometimes it returns an array of errors
       if (err.error.errors) {
-         const firstKey = Object.keys(err.error.errors)[0];
-         if (firstKey && err.error.errors[firstKey].length > 0) {
-            return err.error.errors[firstKey][0];
-         }
+        const firstKey = Object.keys(err.error.errors)[0];
+        if (firstKey && err.error.errors[firstKey].length > 0) {
+          return err.error.errors[firstKey][0];
+        }
       }
     }
 
@@ -207,7 +210,7 @@ export class ProductDetailComponent implements OnInit {
       formData.append('imageFiles', file);
     });
 
-    const request$ = val.id 
+    const request$ = val.id
       ? this.variantService.updateVariant(val.id, formData)
       : this.variantService.addVariant(formData);
 
@@ -244,7 +247,7 @@ export class ProductDetailComponent implements OnInit {
 
     this.isSubmitting.set(true);
     const val = this.productEditForm.value;
-    
+
     const dto = {
       name: val.name,
       description: val.description,
@@ -268,7 +271,7 @@ export class ProductDetailComponent implements OnInit {
 
   onDeleteVariant(id: number) {
     const message = this.langService.currentLang() === 'ar' ? 'هل أنت متأكد من حذف هذا النوع؟' : 'Are you sure you want to delete this variant?';
-    
+
     this.confirmation.set({
       message,
       action: () => {
@@ -304,7 +307,7 @@ export class ProductDetailComponent implements OnInit {
   addToCart() {
     const variant = this.selectedVariant();
     if (!variant) return;
-    
+
     if (variant.stockQuantity <= 0) {
       this.showNotify(this.langService.t('productDetail.soldOut') || 'Out of stock', 'error');
       return;
@@ -334,5 +337,26 @@ export class ProductDetailComponent implements OnInit {
 
   onLogout() {
     this.authService.logout();
+  }
+
+  toggleWishlist() {
+    const p = this.product();
+    if (!p) return;
+
+    if (!this.authService.currentUser()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    this.wishlistService.toggleWishlist(p.id).subscribe({
+      next: () => {
+        const isIn = this.wishlistService.isInWishlist(p.id);
+        this.showNotify(isIn ? 'Added to favorites' : 'Removed from favorites', 'success');
+      },
+      error: (err) => {
+        const msg = this.getErrorMessage(err, 'Failed to update favorites');
+        this.showNotify(msg, 'error');
+      }
+    });
   }
 }

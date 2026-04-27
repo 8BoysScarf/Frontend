@@ -7,11 +7,12 @@ import { OrderService } from '../../services/order';
 import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
 import { Location } from '@angular/common';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavbarComponent],
   templateUrl: './cart.html'
 })
 export class CartComponent implements OnInit {

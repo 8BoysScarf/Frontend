@@ -5,12 +5,14 @@ import { LanguageService } from '../../services/language';
 import { ProductImageService } from '../../services/product-image';
 import { ProductService, Product } from '../../services/product';
 import { CartService } from '../../services/cart';
+import { WishlistService } from '../../services/wishlist';
 import { CommonModule } from '@angular/common';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, NavbarComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -20,6 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   productImageService = inject(ProductImageService);
   productService = inject(ProductService);
   cartService = inject(CartService);
+  wishlistService = inject(WishlistService);
 
   heroImages = signal<string[]>([]);
   featuredProducts = signal<Product[]>([]);
@@ -64,5 +67,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onLogout() {
     this.authService.logout();
+  }
+
+  toggleWishlist(productId: number, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.authService.currentUser()) {
+      return;
+    }
+    this.wishlistService.toggleWishlist(productId).subscribe({
+      error: (err) => console.error('Wishlist toggle failed', err)
+    });
   }
 }

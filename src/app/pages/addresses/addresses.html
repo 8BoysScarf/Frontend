@@ -1,71 +1,7 @@
 <div class="min-h-screen bg-slate-50 flex flex-col" [dir]="langService.currentLang() === 'ar' ? 'rtl' : 'ltr'">
 
   <!-- Navigation -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <div class="flex items-center gap-2 group cursor-pointer" routerLink="/">
-          <div
-            class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-            </svg>
-          </div>
-          <span
-            class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
-            {{ langService.t('home.storeName') }}
-          </span>
-        </div>
-        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-          <a routerLink="/" class="hover:text-indigo-600 transition-colors relative group">
-            {{ langService.t('nav.home') || 'Home' }}
-            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-          </a>
-          <a routerLink="/addresses" class="text-indigo-600 font-bold transition-colors relative group">
-            {{ langService.t('nav.addresses') || 'My Addresses' }}
-            <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-indigo-600 transition-all"></span>
-          </a>
-        </div>
-        <div class="flex items-center gap-4">
-          <!-- Language Switcher -->
-          <button (click)="langService.toggleLang()"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all uppercase">
-            {{ langService.currentLang() === 'ar' ? 'En' : 'ع' }}
-          </button>
-
-          <div class="flex items-center gap-4">
-            <a routerLink="/cart" class="relative p-2 text-slate-400 hover:text-indigo-600 transition-colors">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-              </svg>
-              @if (cartService.cartItemCount() > 0) {
-                <span class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-bounce">
-                  {{ cartService.cartItemCount() }}
-                </span>
-              }
-            </a>
-            <div class="h-6 w-px bg-slate-200"></div>
-            <div class="flex items-center gap-3">
-              <div class="text-right hidden sm:block">
-                <p class="text-sm font-bold text-slate-900">{{ authService.currentUser()?.name || authService.currentUser()?.username }}</p>
-                <div class="flex gap-2 justify-end mt-0.5">
-                  <a routerLink="/orders" class="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-colors">{{ langService.t('nav.orders') || 'Orders' }}</a>
-                  <span class="text-slate-300 text-[10px]">|</span>
-                  <a routerLink="/addresses" class="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-colors">{{ langService.t('nav.addresses') || 'Addresses' }}</a>
-                  <span class="text-slate-300 text-[10px]">|</span>
-                  <button (click)="onLogout()" class="text-[10px] font-black text-rose-500 hover:text-rose-700 uppercase tracking-widest transition-colors">{{ langService.t('nav.logout') }}</button>
-                </div>
-              </div>
-            <div class="w-10 h-10 rounded-full border-2 border-indigo-600 p-0.5 shadow-md overflow-hidden bg-slate-200 hover:scale-110 transition-transform cursor-pointer">
-              <img [src]="authService.currentUser()?.profilePic || 'https://ui-avatars.com/api/?name=' + (authService.currentUser()?.name || 'User')" class="w-full h-full object-cover rounded-full">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
+  <app-navbar mode="simple"></app-navbar>
 
   <!-- Main Content Area -->
   <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">

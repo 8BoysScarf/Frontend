@@ -7,11 +7,12 @@ import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
 import { CartService } from '../../services/cart';
 import { Location } from '@angular/common';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-addresses',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './addresses.html'
 })
 export class AddressesComponent implements OnInit {

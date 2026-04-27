@@ -19,7 +19,8 @@ export class LanguageService {
         logout: 'تسجيل الخروج',
         addresses: 'عناويني',
         cart: 'السلة',
-        orders: 'طلباتي'
+        orders: 'طلباتي',
+        wishlist: 'المفضلة'
       },
       orders: {
         title: 'طلباتي',
@@ -311,7 +312,17 @@ export class LanguageService {
         cancel: 'إلغاء',
         delete: 'حذف',
         confirmDelete: 'هل أنت متأكد؟',
-        deleteVariantMsg: 'سيتم حذف هذا المتغير نهائياً ولا يمكن التراجع.'
+        deleteVariantMsg: 'سيتم حذف هذا المتغير نهائياً ولا يمكن التراجع.',
+      },
+      wishlist: {
+        title: 'منتجاتك المفضلة',
+        subtitle: 'المنتجات التي قمت بحفظها لوقت لاحق.',
+        empty: 'قائمة المفضلة فارغة',
+        emptyDesc: 'استكشف مجموعتنا وأضف المنتجات التي تعجبك إلى مفضلتك.',
+        explore: 'ابدأ التسوق',
+        removed: 'تمت الإزالة من المفضلة',
+        error: 'فشلت العملية',
+        view: 'عرض المنتج'
       }
     },
     en: {
@@ -325,7 +336,8 @@ export class LanguageService {
         logout: 'Logout',
         addresses: 'My Addresses',
         cart: 'Cart',
-        orders: 'My Orders'
+        orders: 'My Orders',
+        wishlist: 'Wishlist'
       },
       orders: {
         title: 'My Orders',
@@ -618,6 +630,16 @@ export class LanguageService {
         delete: 'Delete',
         confirmDelete: 'Are you sure?',
         deleteVariantMsg: 'This variant will be permanently deleted and cannot be undone.'
+      },
+      wishlist: {
+        title: 'Your Favorites',
+        subtitle: 'Products you have saved for later.',
+        empty: 'Your wishlist is empty',
+        emptyDesc: 'Explore our collection and add items to your favorites.',
+        explore: 'Start Shopping',
+        removed: 'Removed from favorites',
+        error: 'Operation failed',
+        view: 'View Product'
       }
     }
   };

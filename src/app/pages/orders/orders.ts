@@ -5,11 +5,12 @@ import { OrderService, OrderSummaryDTO } from '../../services/order';
 import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
 import { Location } from '@angular/common';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavbarComponent],
   templateUrl: './orders.html'
 })
 export class OrdersComponent implements OnInit {
