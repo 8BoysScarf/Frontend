@@ -8,11 +8,12 @@ import { CartService } from '../../services/cart';
 import { WishlistService } from '../../services/wishlist';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../components/navbar/navbar';
+import { ProductCardComponent } from '../../components/product-card/product-card.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, CommonModule, NavbarComponent],
+  imports: [RouterLink, CommonModule, NavbarComponent, ProductCardComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

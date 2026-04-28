@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { OrderService, OrderDetailsDTO } from '../../services/order';
 import { LanguageService } from '../../services/language';
+import { AuthService } from '../../services/auth';
 import { Location } from '@angular/common';
 import { NavbarComponent } from '../../components/navbar/navbar';
 
@@ -15,6 +16,7 @@ import { NavbarComponent } from '../../components/navbar/navbar';
 export class OrderDetailsComponent implements OnInit {
   orderService = inject(OrderService);
   langService = inject(LanguageService);
+  authService = inject(AuthService);
   route = inject(ActivatedRoute);
   location = inject(Location);
 

@@ -6,19 +6,22 @@ import { ProductVariant } from './product'; // Corrected import path
 
 export interface CartItem {
   id: number;
-  cartId: number;
   productVariantId: number;
   quantity: number;
-  // Note: the backend might not return productVariant directly unless included, 
-  // but we define it here optionally just in case we can patch it or it gets returned.
-  productVariant?: ProductVariant; 
+  code?: string;
+  size?: string;
+  price: number;
+  thumbnail?: string;
+  productId: number;
+  productName?: string;
+  colorName?: string;
+  colorHex?: string;
+  discount?: number;
+  realPrice: number;
+  stockQuantity: number;
 }
 
-export interface Cart {
-  id: number;
-  userId: string;
-  items: CartItem[];
-}
+// Removed Cart interface as the backend returns CartItem[] directly
 
 export interface AddToCartDTO {
   productVariantId: number;
@@ -55,10 +58,10 @@ export class CartService {
     };
   }
 
-  getCart(): Observable<Cart> {
-    return this.http.get<Cart>(this.baseUrl, this.getHeaders()).pipe(
-      tap(cart => {
-        const count = cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+  getCart(): Observable<CartItem[]> {
+    return this.http.get<CartItem[]>(this.baseUrl, this.getHeaders()).pipe(
+      tap(items => {
+        const count = items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
         this.cartItemCount.set(count);
       })
     );

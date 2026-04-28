@@ -71,10 +71,28 @@ export class AuthService {
 
   private getUserFromStorage() {
     if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('user');
+      const userStr = localStorage.getItem('user');
+      if (!userStr) return null;
+
       try {
-        return user ? JSON.parse(user) : null;
-      } catch {
+        const user = JSON.parse(userStr);
+        
+        // Check for expiration
+        if (user.expiresAt) {
+          const expiryDate = new Date(user.expiresAt);
+          const now = new Date();
+          
+          if (now >= expiryDate) {
+            console.warn('Session expired. Logging out.');
+            this.logout();
+            return null;
+          }
+        }
+        
+        return user;
+      } catch (e) {
+        console.error('Error parsing user from storage', e);
+        this.logout();
         return null;
       }
     }

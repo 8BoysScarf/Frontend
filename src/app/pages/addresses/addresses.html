@@ -116,8 +116,13 @@
         <form [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="space-y-5">
           <div>
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{ langService.t('addresses.city') || 'City' }}</label>
-            <input type="text" formControlName="city" placeholder="{{ langService.t('addresses.cityPlaceholder') || 'e.g. Riyadh' }}"
-              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50 focus:bg-white transition-colors">
+            <select formControlName="city"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50 focus:bg-white transition-colors appearance-none">
+              <option value="" disabled selected>{{ langService.t('addresses.selectCity') || 'Select a City' }}</option>
+              @for (cityItem of cities(); track cityItem.id) {
+                <option [value]="cityItem.city">{{ cityItem.city }}</option>
+              }
+            </select>
           </div>
 
           <div>

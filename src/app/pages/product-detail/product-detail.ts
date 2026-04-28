@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProductService, ProductDetails, ProductVariant } from '../../services/product';
@@ -13,6 +13,7 @@ import { Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
 import { NavbarComponent } from '../../components/navbar/navbar';
+import { ReviewService, AddReviewDTO } from '../../services/review';
 
 @Component({
   selector: 'app-product-detail',
@@ -33,6 +34,7 @@ export class ProductDetailComponent implements OnInit {
   private location = inject(Location);
   private fb = inject(FormBuilder);
   public wishlistService = inject(WishlistService);
+  private reviewService = inject(ReviewService);
 
   product = signal<ProductDetails | null>(null);
   selectedVariant = signal<ProductVariant | null>(null);
@@ -43,6 +45,14 @@ export class ProductDetailComponent implements OnInit {
   showAddVariantModal = signal(false);
   showEditProductModal = signal(false);
   activeImage = signal<string>('');
+  showReviewForm = false;
+
+  averageRating = computed(() => {
+    const reviews = this.product()?.reviews;
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return Number((sum / reviews.length).toFixed(1));
+  });
 
   variantForm = this.fb.group({
     id: [null as number | null],
@@ -63,6 +73,11 @@ export class ProductDetailComponent implements OnInit {
     description: ['', Validators.required],
     categoryId: [null as number | null, Validators.required]
   });
+  
+  reviewForm = this.fb.group({
+    rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+    comment: ['', [Validators.required, Validators.minLength(3)]]
+  });
 
   notification = signal<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
   confirmation = signal<{ message: string, action: () => void } | null>(null);
@@ -70,8 +85,9 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    const variantId = Number(this.route.snapshot.queryParamMap.get('variantId'));
     if (id) {
-      this.loadProduct(id);
+      this.loadProduct(id, variantId);
       this.loadColors();
       this.loadCategories();
     }
@@ -136,7 +152,7 @@ export class ProductDetailComponent implements OnInit {
     this.categoryService.getCategories().subscribe(data => this.categories.set(data));
   }
 
-  loadProduct(id: number) {
+  loadProduct(id: number, targetVariantId?: number) {
     this.productService.getProduct(id).subscribe({
       next: (data) => {
         if (!data) {
@@ -145,7 +161,7 @@ export class ProductDetailComponent implements OnInit {
         }
         this.product.set(data);
         if (data.variants && data.variants.length > 0) {
-          const currentId = this.selectedVariant()?.id;
+          const currentId = targetVariantId || this.selectedVariant()?.id;
           const found = data.variants.find((v: any) => v.id === currentId);
           this.selectVariant(found || data.variants[0]);
         }
@@ -358,5 +374,66 @@ export class ProductDetailComponent implements OnInit {
         this.showNotify(msg, 'error');
       }
     });
+  }
+
+  onSubmitReview() {
+    const p = this.product();
+    if (!p || this.reviewForm.invalid) return;
+
+    if (!this.authService.currentUser()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    const dto: AddReviewDTO = {
+      productId: p.id,
+      productVariantId: this.selectedVariant()?.id,
+      rating: this.reviewForm.value.rating!,
+      comment: this.reviewForm.value.comment!
+    };
+
+    this.reviewService.addReview(dto).subscribe({
+      next: () => {
+        this.showNotify(this.langService.t('reviews.addSuccess'), 'success');
+        this.reviewForm.reset({ rating: 5, comment: '' });
+        this.loadProduct(p.id);
+        this.isSubmitting.set(false);
+      },
+      error: (err) => {
+        const msg = this.getErrorMessage(err, 'Failed to post review');
+        this.showNotify(msg, 'error');
+        this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  onDeleteReview(id: number) {
+    const message = this.langService.currentLang() === 'ar' ? 'هل أنت متأكد من حذف هذا التقييم؟' : 'Are you sure you want to delete this review?';
+    
+    this.confirmation.set({
+      message,
+      action: () => {
+        this.reviewService.deleteReview(id).subscribe({
+          next: () => {
+            this.showNotify(this.langService.t('reviews.deleteSuccess'), 'success');
+            this.loadProduct(this.product()!.id);
+            this.confirmation.set(null);
+          },
+          error: (err) => {
+            const msg = this.getErrorMessage(err, 'Failed to delete review');
+            this.showNotify(msg, 'error');
+            this.confirmation.set(null);
+          }
+        });
+      }
+    });
+  }
+
+  scrollToReviews() {
+    const el = document.getElementById('reviews-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 }

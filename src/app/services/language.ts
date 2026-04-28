@@ -20,7 +20,8 @@ export class LanguageService {
         addresses: 'عناويني',
         cart: 'السلة',
         orders: 'طلباتي',
-        wishlist: 'المفضلة'
+        wishlist: 'المفضلة',
+        addAddress: 'إضافة عنوان'
       },
       orders: {
         title: 'طلباتي',
@@ -29,7 +30,8 @@ export class LanguageService {
         items: 'المنتجات',
         emptyTitle: 'لا توجد طلبات بعد',
         emptyDesc: 'لم تقم بإجراء أي طلبات حتى الآن. ابدأ التسوق الآن!',
-        backToList: 'العودة لقائمة طلباتي'
+        backToList: 'العودة لقائمة طلباتي',
+        updateSuccess: 'تم تحديث حالة الطلب بنجاح'
       },
       cart: {
         title: 'سلة المشتريات',
@@ -45,6 +47,7 @@ export class LanguageService {
         free: 'مجاني',
         total: 'الإجمالي',
         deliveryAddress: 'عنوان التوصيل',
+        addNew: 'إضافة جديد',
         noAddress: 'يرجى إضافة عنوان توصيل أولاً.',
         addAddress: 'إضافة عنوان',
         checkout: 'إتمام الطلب',
@@ -56,6 +59,7 @@ export class LanguageService {
         title: 'عناويني',
         desc: 'إدارة عناوين التوصيل الخاصة بك.',
         addNew: 'إضافة عنوان جديد',
+        selectCity: 'اختر مدينة',
         loadError: 'فشل في تحميل العناوين',
         updateSuccess: 'تم تحديث العنوان بنجاح',
         updateError: 'فشل في تحديث العنوان',
@@ -106,7 +110,12 @@ export class LanguageService {
         newsletterDesc: 'احصل على وصول حصري لأحدث الصيحات، المبيعات الخاصة، ونصائح الموضة مباشرة إلى بريدك الإلكتروني.',
         subscribe: 'اشترك الآن',
         emailPlaceholder: 'أدخل بريدك الإلكتروني',
-        rights: 'جميع الحقوق محفوظة.'
+        rights: 'جميع الحقوق محفوظة.',
+        searchPlaceholder: 'ابحث عن منتجات...',
+        all: 'جميع الفئات',
+        newArrivals: 'وصل حديثاً',
+        newArrivalsDesc: 'اكتشف أحدث الإضافات إلى مجموعتنا.',
+        clearFilters: 'مسح الفلاتر'
       },
       login: {
         title: 'مرحباً بعودتك',
@@ -142,7 +151,10 @@ export class LanguageService {
           categories: 'الفئات',
           colors: 'الألوان',
           badges: 'الأوسمة',
-          orders: 'الطلبات'
+          orders: 'الطلبات',
+          reviews: 'التقييمات',
+          users: 'المستخدمين',
+          shipping: 'الشحن'
         },
         sidebar: {
           products: 'إدارة المنتجات',
@@ -150,6 +162,9 @@ export class LanguageService {
           colors: 'إدارة الألوان',
           badges: 'إدارة الأوسمة',
           orders: 'إدارة الطلبات',
+          reviews: 'إدارة التقييمات',
+          users: 'إدارة المستخدمين',
+          shipping: 'إدارة الشحن',
           analysis: 'تحليل الأداء',
           status: 'حالة النظام',
           encrypted: 'اتصال مشفر',
@@ -166,10 +181,11 @@ export class LanguageService {
           access: 'صلاحية المستوى 4',
           online: 'متصل',
           control: 'لوحة تحكم',
-          addProduct: 'منتج جديد',
           newCategory: 'فئة جديدة',
           defineColor: 'تعريف لون',
           createBadge: 'إنشاء وسم',
+          allStatus: 'كل الحالات',
+          status: 'حالة الطلب',
           identity: 'الهوية',
           category: 'الفئة',
           price: 'السعر',
@@ -215,14 +231,27 @@ export class LanguageService {
           confirm: 'تأكيد',
           confirmOp: 'تأكيد العملية',
           add: 'إضافة',
+          shipping: {
+            title: 'أسعار الشحن لكل مدينة',
+            configured: 'المدن المهيأة',
+            cityName: 'اسم المدينة',
+            currentRate: 'السعر الحالي',
+            newRate: 'السعر الجديد',
+            update: 'تحديث',
+            add: 'إضافة منطقة شحن'
+          },
           editProduct: 'تعديل المنتج',
-          updateProduct: 'تحديث المنتج'
+          updateProduct: 'تحديث المنتج',
+          min: 'الحد الأدنى',
+          max: 'الحد الأقصى'
         },
         stats: {
           products: 'إجمالي المنتجات',
           orders: 'إجمالي الطلبات',
+          reviews: 'إجمالي التقييمات',
           revenue: 'الأرباح',
-          customers: 'العملاء'
+          customers: 'العملاء',
+          shipping: 'مناطق الشحن'
         },
         products: {
           title: 'كتالوج المنتجات',
@@ -288,12 +317,15 @@ export class LanguageService {
         outOfStock: 'نفد',
         addToCart: 'أضف إلى السلة',
         general: 'عام',
-        notFound: 'المنتج غير موجود',
-        notFoundDesc: 'المنتج الذي تبحث عنه غير متوفر أو تم نقله.',
+        notFound: 'لم يتم العثور على منتجات',
+        notFoundDesc: 'حاول تعديل الفلاتر للعثور على ما تبحث عنه.',
+        available: 'متاح',
         goBack: 'العودة',
         default: 'افتراضي',
         soldOut: 'نفد من المخزون',
         addVariantTitle: 'إضافة متغير جديد',
+        editVariant: 'تعديل المتغير',
+        updateVariant: 'تحديث المتغير',
         configureStock: 'تكوين المخزون لـ',
         size: 'الحجم / المقاس',
         sizePlaceholder: 'مثال: XL، 42، 50ml',
@@ -323,6 +355,21 @@ export class LanguageService {
         removed: 'تمت الإزالة من المفضلة',
         error: 'فشلت العملية',
         view: 'عرض المنتج'
+      },
+      reviews: {
+        title: 'تقييمات العملاء',
+        write: 'اكتب تقييماً',
+        rating: 'التقييم',
+        comment: 'التعليق',
+        submit: 'إرسال التقييم',
+        noReviews: 'لا توجد تقييمات لهذا المنتج بعد.',
+        delete: 'حذف التقييم',
+        product: 'المنتج',
+        user: 'المستخدم',
+        manage: 'إدارة التقييمات',
+        empty: 'لا توجد تقييمات حالياً.',
+        addSuccess: 'تمت إضافة تقييمك بنجاح!',
+        deleteSuccess: 'تم حذف التقييم بنجاح'
       }
     },
     en: {
@@ -337,7 +384,8 @@ export class LanguageService {
         addresses: 'My Addresses',
         cart: 'Cart',
         orders: 'My Orders',
-        wishlist: 'Wishlist'
+        wishlist: 'Wishlist',
+        addAddress: 'Add Address'
       },
       orders: {
         title: 'My Orders',
@@ -346,7 +394,8 @@ export class LanguageService {
         items: 'Order Items',
         emptyTitle: 'No Orders Yet',
         emptyDesc: 'You haven\'t placed any orders yet. Start shopping now!',
-        backToList: 'Back to My Orders'
+        backToList: 'Back to My Orders',
+        updateSuccess: 'Order status updated successfully'
       },
       cart: {
         title: 'Shopping Cart',
@@ -362,6 +411,7 @@ export class LanguageService {
         free: 'Free',
         total: 'Total',
         deliveryAddress: 'Delivery Address',
+        addNew: 'Add New',
         noAddress: 'Please add a delivery address first.',
         addAddress: 'Add Address',
         checkout: 'Place Order',
@@ -373,6 +423,7 @@ export class LanguageService {
         title: 'My Addresses',
         desc: 'Manage your delivery addresses.',
         addNew: 'Add New Address',
+        selectCity: 'Select a City',
         loadError: 'Failed to load addresses',
         updateSuccess: 'Address updated successfully',
         updateError: 'Failed to update address',
@@ -423,7 +474,12 @@ export class LanguageService {
         newsletterDesc: 'Get exclusive access to new arrivals, private sales, and fashion tips delivered straight to your inbox.',
         subscribe: 'Subscribe',
         emailPlaceholder: 'Enter your email',
-        rights: '8Boys Ecommerce. All rights reserved.'
+        rights: '8Boys Ecommerce. All rights reserved.',
+        searchPlaceholder: 'Search products...',
+        all: 'All Categories',
+        newArrivals: 'New Arrivals',
+        newArrivalsDesc: 'Discover the latest additions to our collection.',
+        clearFilters: 'Clear Filters'
       },
       login: {
         title: 'Welcome Back',
@@ -459,7 +515,10 @@ export class LanguageService {
           categories: 'Categories',
           colors: 'Colors',
           badges: 'Badges',
-          orders: 'Orders'
+          orders: 'Orders',
+          reviews: 'Reviews',
+          users: 'Users',
+          shipping: 'Shipping'
         },
         sidebar: {
           products: 'Manage Products',
@@ -467,6 +526,9 @@ export class LanguageService {
           colors: 'Manage Colors',
           badges: 'Manage Badges',
           orders: 'Manage Orders',
+          reviews: 'Manage Reviews',
+          users: 'User Management',
+          shipping: 'Shipping Management',
           analysis: 'Performance Analysis',
           status: 'Node Status',
           encrypted: 'Encrypted Connection',
@@ -487,6 +549,8 @@ export class LanguageService {
           newCategory: 'New Category',
           defineColor: 'Define Color',
           createBadge: 'Create Badge',
+          allStatus: 'All Statuses',
+          status: 'Order Status',
           identity: 'Identity',
           category: 'Category',
           price: 'Price',
@@ -532,14 +596,27 @@ export class LanguageService {
           confirm: 'Confirm',
           confirmOp: 'Confirm Operation',
           add: 'Add',
+          shipping: {
+            title: 'Shipping Rates by City',
+            configured: 'Configured Cities',
+            cityName: 'City Name',
+            currentRate: 'Current Rate',
+            newRate: 'New Rate',
+            update: 'Update',
+            add: 'Add Shipping Zone'
+          },
           editProduct: 'Edit Product',
-          updateProduct: 'Update Product'
+          updateProduct: 'Update Product',
+          min: 'Min',
+          max: 'Max'
         },
         stats: {
           products: 'Total Products',
           orders: 'Total Orders',
+          reviews: 'Total Reviews',
           revenue: 'Revenue',
-          customers: 'Customers'
+          customers: 'Customers',
+          shipping: 'Shipping Zones'
         },
         products: {
           title: 'Product Catalog',
@@ -605,12 +682,15 @@ export class LanguageService {
         outOfStock: 'Out',
         addToCart: 'Add to Cart',
         general: 'General',
-        notFound: 'Product Not Found',
-        notFoundDesc: 'The product you are looking for has been moved or is unavailable.',
+        notFound: 'No Products Found',
+        notFoundDesc: 'Try adjusting your filters to find what you are looking for.',
+        available: 'Available',
         goBack: 'Go Back',
         default: 'Default',
         soldOut: 'Sold Out',
         addVariantTitle: 'Add New Variant',
+        editVariant: 'Edit Variant',
+        updateVariant: 'Update Variant',
         configureStock: 'Configure Stock for',
         size: 'Size / Dimensions',
         sizePlaceholder: 'e.g. XL, 42, 50ml',
@@ -640,6 +720,21 @@ export class LanguageService {
         removed: 'Removed from favorites',
         error: 'Operation failed',
         view: 'View Product'
+      },
+      reviews: {
+        title: 'Customer Reviews',
+        write: 'Write a Review',
+        rating: 'Rating',
+        comment: 'Comment',
+        submit: 'Submit Review',
+        noReviews: 'No reviews for this product yet.',
+        delete: 'Delete Review',
+        product: 'Product',
+        user: 'User',
+        manage: 'Manage Reviews',
+        empty: 'No reviews found.',
+        addSuccess: 'Review added successfully!',
+        deleteSuccess: 'Review deleted successfully'
       }
     }
   };

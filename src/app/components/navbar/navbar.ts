@@ -5,6 +5,7 @@ import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
 import { CartService } from '../../services/cart';
 import { WishlistService } from '../../services/wishlist';
+import { AddressService, Address } from '../../services/address';
 
 @Component({
   selector: 'app-navbar',
@@ -22,14 +23,29 @@ export class NavbarComponent {
   @Input() mode: 'full' | 'simple' = 'full';
   
   isMenuOpen = signal(false);
+  defaultAddress = signal<Address | null>(null);
 
   constructor(
     public langService: LanguageService,
     public authService: AuthService,
     public cartService: CartService,
     public wishlistService: WishlistService,
+    public addressService: AddressService,
     private router: Router
-  ) {}
+  ) {
+    if (this.authService.currentUser()) {
+      this.loadDefaultAddress();
+    }
+  }
+
+  loadDefaultAddress() {
+    this.addressService.getAll().subscribe({
+      next: (data) => {
+        const addr = data.find(a => a.isDefault) || (data.length > 0 ? data[0] : null);
+        this.defaultAddress.set(addr);
+      }
+    });
+  }
 
   toggleMenu() {
     this.isMenuOpen.update(v => !v);

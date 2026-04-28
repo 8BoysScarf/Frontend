@@ -31,6 +31,17 @@ export interface ProductVariant {
   imageUrls: string[];
 }
 
+export interface ReviewDTO {
+  id: number;
+  userId: string;
+  userPhotoUrl?: string;
+  userName?: string;
+  rating: number;
+  comment: string;
+  productId: number;
+  productName?: string;
+}
+
 export interface ProductDetails {
   id: number;
   name: string;
@@ -39,6 +50,14 @@ export interface ProductDetails {
   categoryName: string;
   badges: string[];
   variants: ProductVariant[];
+  reviews: ReviewDTO[];
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
 }
 
 @Injectable({
@@ -66,5 +85,9 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
+  getCards(params: any): Observable<PagedResult<Product>> {
+    return this.http.get<PagedResult<Product>>(`${this.baseUrl}/cards`, { params });
   }
 }

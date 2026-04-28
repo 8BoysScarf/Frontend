@@ -11,16 +11,21 @@
     } @else if (orders().length > 0) {
     <div class="space-y-4">
       @for (order of orders(); track order.id) {
-      <div [routerLink]="['/order', order.id]" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group">
+      <div
+        (click)="viewOrderDetails(order.id)"
+        class="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 group cursor-pointer animate-fade-in-up">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <div
+              class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
               </svg>
             </div>
             <div>
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ langService.t('orders.orderId') || 'Order ID' }}</p>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{
+                langService.t('orders.orderId') || 'Order ID' }}</p>
               <h3 class="text-lg font-black text-slate-900">#{{ order.id }}</h3>
             </div>
           </div>
@@ -28,12 +33,18 @@
           <div class="flex items-center gap-6">
             <div class="text-right hidden sm:block">
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ langService.t('cart.total') }}</p>
-              <p class="text-lg font-black text-indigo-600">${{ order.totalAmount }}</p>
+              <p class="text-lg font-black text-indigo-600">${{ order.totalAmount + order.shippingPrice }}</p>
+              <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                {{ langService.t('cart.shipping') }}: ${{ order.shippingPrice }}
+              </p>
             </div>
-            <span class="px-4 py-1.5 rounded-full text-xs font-bold border uppercase tracking-widest" [ngClass]="getStatusClass(order.status)">
+            <span class="px-4 py-1.5 rounded-full text-xs font-bold border uppercase tracking-widest"
+              [ngClass]="getStatusClass(order.status)">
               {{ order.status }}
             </span>
-            <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-600 transition-colors" [class.rotate-180]="langService.currentLang() !== 'ar'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-600 transition-colors"
+              [class.rotate-180]="langService.currentLang() !== 'ar'" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
           </div>
@@ -42,16 +53,31 @@
       }
     </div>
     } @else {
-    <div class="flex flex-col items-center justify-center min-h-[40vh] text-center bg-white rounded-[2.5rem] p-10 border border-slate-100">
+    <div
+      class="flex flex-col items-center justify-center min-h-[40vh] text-center bg-white rounded-[2.5rem] p-10 border border-slate-100">
       <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-6">
         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+          </path>
         </svg>
       </div>
-      <h2 class="text-2xl font-black text-slate-900 mb-2">{{ langService.t('orders.emptyTitle') || 'No Orders Yet' }}</h2>
-      <p class="text-slate-400 mb-8 max-w-xs">{{ langService.t('orders.emptyDesc') || 'You haven\'t placed any orders yet. Start shopping now!' }}</p>
-      <a routerLink="/" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all">{{ langService.t('cart.continue') }}</a>
+      <h2 class="text-2xl font-black text-slate-900 mb-2">{{ langService.t('orders.emptyTitle') || 'No Orders Yet' }}
+      </h2>
+      <p class="text-slate-400 mb-8 max-w-xs">{{ langService.t('orders.emptyDesc') || 'You haven\'t placed any orders
+        yet. Start shopping now!' }}</p>
+      <a routerLink="/"
+        class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all">{{
+        langService.t('cart.continue') }}</a>
     </div>
     }
   </main>
+
+  <!-- Order Details Modal -->
+  <app-order-details-modal
+    [isOpen]="showOrderDetailsModal"
+    [isLoading]="isOrderLoading"
+    [order]="selectedOrderDetails()"
+    (close)="showOrderDetailsModal = false">
+  </app-order-details-modal>
 </div>

@@ -6,14 +6,19 @@ import { ProductService, Product } from '../../../services/product';
 import { CategoryService, Category, AddCategoryDTO } from '../../../services/category';
 import { ColorService, Color, AddColorDTO } from '../../../services/color';
 import { BadgeService, Badge, AddBadgeDTO } from '../../../services/badge';
+import { ReviewService, ReviewDTO } from '../../../services/review';
+import { OrderService, OrderSummaryDTO } from '../../../services/order';
+import { AdminService, AdminUserDTO } from '../../../services/admin';
+import { ShippingService, CityShipping } from '../../../services/shipping';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AdminSidebarComponent } from '../../../components/admin-sidebar/admin-sidebar.component';
+import { OrderDetailsModalComponent } from '../../../components/order-details-modal/order-details-modal.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, AdminSidebarComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, AdminSidebarComponent, OrderDetailsModalComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -24,24 +29,61 @@ export class DashboardComponent implements OnInit {
   categoryService = inject(CategoryService);
   colorService = inject(ColorService);
   badgeService = inject(BadgeService);
+  reviewService = inject(ReviewService);
+  orderService = inject(OrderService);
+  adminService = inject(AdminService);
+  shippingService = inject(ShippingService);
   router = inject(Router);
   route = inject(ActivatedRoute);
   fb = inject(FormBuilder);
 
-  activeTab: 'products' | 'categories' | 'colors' | 'badges' | 'orders' = 'products';
+  activeTab: 'products' | 'categories' | 'colors' | 'badges' | 'orders' | 'reviews' | 'users' | 'shipping' = 'products';
 
   // Use Signals for better performance and reactivity
   products = signal<Product[]>([]);
   categories = signal<Category[]>([]);
   colors = signal<Color[]>([]);
   badges = signal<Badge[]>([]);
+  reviews = signal<ReviewDTO[]>([]);
+  ordersList = signal<OrderSummaryDTO[]>([]);
+  users = signal<AdminUserDTO[]>([]);
+  cityShippings = signal<CityShipping[]>([]);
+  ordersTotal = signal(0);
+  ordersPage = signal(1);
+  ordersStatusFilter = signal<string>('');
+  selectedOrderDetails = signal<any | null>(null);
+  showOrderDetailsModal = false;
+
+  reviewsCount = computed(() => this.reviews().length);
+  usersCount = computed(() => this.users().length);
+  shippingCitiesCount = computed(() => this.cityShippings().length);
 
   showAddModal = false;
   showAddCategoryModal = false;
   showAddColorModal = false;
   showAddBadgeModal = false;
+  showAddShippingModal = false;
   isLoading = false;
+  isOrderLoading = false;
   selectedFiles: File[] = [];
+
+  viewOrderDetails(id: number) {
+    this.isOrderLoading = true;
+    this.showOrderDetailsModal = true;
+    this.selectedOrderDetails.set(null);
+
+    this.orderService.getOrderDetails(id).subscribe({
+      next: (data) => {
+        this.selectedOrderDetails.set(data);
+        this.isOrderLoading = false;
+      },
+      error: (err) => {
+        this.showNotify('Failed to load order details', 'error');
+        this.isOrderLoading = false;
+        this.showOrderDetailsModal = false;
+      }
+    });
+  }
 
   searchQuery = signal('');
   selectedCategory = signal('');
@@ -49,7 +91,7 @@ export class DashboardComponent implements OnInit {
   filteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
     const cat = this.selectedCategory();
-    
+
     return this.products().filter(p => {
       const matchSearch = (p.name || '').toLowerCase().includes(query) || (p.code || '').toLowerCase().includes(query);
       const matchCat = cat ? p.categoryName === cat : true;
@@ -58,8 +100,8 @@ export class DashboardComponent implements OnInit {
   });
 
   // Notification and Confirmation states
-  notification = signal<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
-  confirmation = signal<{message: string, action: () => void} | null>(null);
+  notification = signal<{ message: string, type: 'success' | 'error' | 'info' } | null>(null);
+  confirmation = signal<{ message: string, action: () => void } | null>(null);
 
   productForm = this.fb.group({
     name: ['', Validators.required],
@@ -76,7 +118,7 @@ export class DashboardComponent implements OnInit {
     colorName: ['', Validators.required],
     badgeId: [null as number | null]
   });
- 
+
   badgeForm = this.fb.group({
     name: ['', Validators.required]
   });
@@ -91,11 +133,20 @@ export class DashboardComponent implements OnInit {
     parentCategoryId: [null as number | null]
   });
 
+  shippingForm = this.fb.group({
+    city: ['', Validators.required],
+    price: [0, [Validators.required, Validators.min(0)]]
+  });
+
   ngOnInit() {
     this.loadProducts();
     this.loadCategories();
     this.loadColors();
     this.loadBadges();
+    this.loadReviews();
+    this.loadOrders();
+    this.loadUsers();
+    this.loadShippingPrices();
 
     this.productForm.get('colorId')?.valueChanges.subscribe(val => {
       const nameCtrl = this.productForm.get('colorName');
@@ -152,6 +203,33 @@ export class DashboardComponent implements OnInit {
     this.badgeService.getBadges().subscribe({
       next: (data) => this.badges.set(data),
       error: (err) => console.error('Error loading badges', err)
+    });
+  }
+
+  loadReviews() {
+    this.reviewService.getReviews().subscribe({
+      next: (data) => this.reviews.set(data),
+      error: (err) => console.error('Error loading reviews', err)
+    });
+  }
+
+  loadOrders() {
+    this.orderService.getAllOrders(this.ordersPage(), 20, this.ordersStatusFilter()).subscribe({
+      next: (res) => {
+        this.ordersList.set(res.items);
+        this.ordersTotal.set(res.totalCount);
+      },
+      error: (err) => console.error('Error loading orders', err)
+    });
+  }
+
+  onUpdateOrderStatus(orderId: number, newStatus: number) {
+    this.orderService.updateOrderStatus(orderId, newStatus).subscribe({
+      next: () => {
+        this.showNotify(this.langService.t('orders.updateSuccess') || 'Status updated', 'success');
+        this.loadOrders();
+      },
+      error: (err) => this.showNotify('Error updating status', 'error')
     });
   }
 
@@ -339,6 +417,118 @@ export class DashboardComponent implements OnInit {
           error: () => {
             this.badges.set(previousState);
             this.showNotify('Failed to remove badge.', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  onDeleteReview(id: number) {
+    this.confirmation.set({
+      message: this.langService.currentLang() === 'ar' ? 'هل أنت متأكد من حذف هذا التقييم؟' : 'Are you sure you want to delete this review?',
+      action: () => {
+        const previousState = this.reviews();
+        this.reviews.update(prev => prev.filter(r => r.id !== id));
+        this.confirmation.set(null);
+
+        this.reviewService.deleteReview(id).subscribe({
+          next: () => this.showNotify(this.langService.t('reviews.deleteSuccess'), 'success'),
+          error: () => {
+            this.reviews.set(previousState);
+            this.showNotify('Error deleting review', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  loadUsers() {
+    this.adminService.getUsers().subscribe({
+      next: (data) => this.users.set(data),
+      error: (err) => console.error('Error loading users', err)
+    });
+  }
+
+  onChangeUserRole(userId: string, role: string) {
+    this.adminService.changeRole(userId, role).subscribe({
+      next: () => {
+        this.showNotify('User role updated successfully', 'success');
+        this.loadUsers();
+      },
+      error: (err) => this.showNotify('Error updating user role', 'error')
+    });
+  }
+
+  onDeleteUser(userId: string) {
+    this.confirmation.set({
+      message: 'Are you sure you want to delete this user permanently?',
+      action: () => {
+        this.adminService.deleteUser(userId).subscribe({
+          next: () => {
+            this.showNotify('User deleted successfully', 'success');
+            this.loadUsers();
+            this.confirmation.set(null);
+          },
+          error: (err) => {
+            this.showNotify('Error deleting user', 'error');
+            this.confirmation.set(null);
+          }
+        });
+      }
+    });
+  }
+
+  loadShippingPrices() {
+    this.shippingService.getAllCityPrices().subscribe({
+      next: (data) => this.cityShippings.set(data),
+      error: (err) => console.error('Error loading shipping prices', err)
+    });
+  }
+
+  onUpdateShippingPrice(city: string, priceInput: HTMLInputElement) {
+    const price = parseFloat(priceInput.value);
+    if (isNaN(price)) {
+      this.showNotify('Please enter a valid price', 'error');
+      return;
+    }
+
+    this.shippingService.setCityPrice(city, price).subscribe({
+      next: () => {
+        this.showNotify(`Price for ${city} updated successfully`, 'success');
+        this.loadShippingPrices();
+      },
+      error: (err) => this.showNotify('Error updating shipping price', 'error')
+    });
+  }
+
+  onAddShipping() {
+    if (this.shippingForm.invalid) return;
+    const { city, price } = this.shippingForm.value;
+
+    this.shippingService.setCityPrice(city!, price!).subscribe({
+      next: () => {
+        this.showNotify(`City ${city} added successfully`, 'success');
+        this.loadShippingPrices();
+        this.showAddShippingModal = false;
+        this.shippingForm.reset({ city: '', price: 0 });
+      },
+      error: (err) => this.showNotify('Error adding city', 'error')
+    });
+  }
+
+  onDeleteCity(id: number) {
+    this.confirmation.set({
+      message: 'Are you sure you want to delete this city shipping zone?',
+      action: () => {
+        this.shippingService.deleteCity(id).subscribe({
+          next: () => {
+            this.showNotify('City deleted successfully', 'success');
+            this.loadShippingPrices();
+            this.confirmation.set(null);
+          },
+          error: (err) => {
+            this.showNotify('Error deleting city', 'error');
+            this.confirmation.set(null);
           }
         });
       }

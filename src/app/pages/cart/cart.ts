@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { CartService, Cart, CartItem } from '../../services/cart';
+import { CartService, CartItem } from '../../services/cart';
 import { AddressService, Address } from '../../services/address';
 import { OrderService } from '../../services/order';
 import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
+import { ShippingService } from '../../services/shipping';
 import { Location } from '@angular/common';
 import { NavbarComponent } from '../../components/navbar/navbar';
 
@@ -18,15 +19,17 @@ import { NavbarComponent } from '../../components/navbar/navbar';
 export class CartComponent implements OnInit {
   cartService = inject(CartService);
   addressService = inject(AddressService);
+  shippingService = inject(ShippingService);
   orderService = inject(OrderService);
   langService = inject(LanguageService);
   authService = inject(AuthService);
   location = inject(Location);
   router = inject(Router);
 
-  cart = signal<Cart | null>(null);
+  cartItems = signal<CartItem[]>([]);
   addresses = signal<Address[]>([]);
   selectedAddressId = signal<number | null>(null);
+  shippingPrice = signal<number>(0);
   isLoading = signal(true);
   isCheckingOut = signal(false);
   notification = signal<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
@@ -34,18 +37,26 @@ export class CartComponent implements OnInit {
   ngOnInit() {
     this.loadCart();
     this.loadAddresses();
+    this.loadShippingPrice();
   }
 
   loadCart() {
     this.isLoading.set(true);
     this.cartService.getCart().subscribe({
       next: (data) => {
-        this.cart.set(data);
+        this.cartItems.set(data);
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
       }
+    });
+  }
+
+  loadShippingPrice() {
+    this.shippingService.getMyShippingPrice().subscribe({
+      next: (data) => this.shippingPrice.set(data.shippingPrice),
+      error: () => this.shippingPrice.set(0)
     });
   }
 
@@ -88,9 +99,13 @@ export class CartComponent implements OnInit {
     this.isCheckingOut.set(true);
     this.orderService.createFromCart(addressId).subscribe({
       next: (res) => {
-        this.showNotify(this.langService.t('cart.checkoutSuccess') || 'Order placed successfully!', 'success');
         this.isCheckingOut.set(false);
-        this.cart.set(null); // Clear local cart
+        if (res.orderId === -1) {
+          alert('Shipping for this city is not configured. Please contact support.');
+          return;
+        }
+        this.showNotify(this.langService.t('cart.checkoutSuccess') || 'Order placed successfully!', 'success');
+        this.cartItems.set([]); // Clear local cart
         this.cartService.cartItemCount.set(0); // Clear global count
         
         setTimeout(() => {
@@ -104,15 +119,17 @@ export class CartComponent implements OnInit {
     });
   }
 
-  calculateTotal(): number {
-    const currentCart = this.cart();
-    if (!currentCart || !currentCart.items) return 0;
+  calculateSubtotal(): number {
+    const items = this.cartItems();
+    if (!items || items.length === 0) return 0;
     
-    return currentCart.items.reduce((total, item) => {
-      // Fallback to 0 if productVariant or price is undefined
-      const price = item.productVariant?.price || 0;
-      return total + (price * item.quantity);
+    return items.reduce((total, item) => {
+      return total + (item.price * item.quantity);
     }, 0);
+  }
+
+  calculateTotal(): number {
+    return this.calculateSubtotal() + this.shippingPrice();
   }
 
   showNotify(message: string, type: 'success' | 'error' | 'info' = 'info') {

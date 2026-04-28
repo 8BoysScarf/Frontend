@@ -6,6 +6,7 @@ import { AddressService, Address, AddAddressDTO, UpdateAddressDTO } from '../../
 import { LanguageService } from '../../services/language';
 import { AuthService } from '../../services/auth';
 import { CartService } from '../../services/cart';
+import { ShippingService, CityShipping } from '../../services/shipping';
 import { Location } from '@angular/common';
 import { NavbarComponent } from '../../components/navbar/navbar';
 
@@ -17,6 +18,7 @@ import { NavbarComponent } from '../../components/navbar/navbar';
 })
 export class AddressesComponent implements OnInit {
   addressService = inject(AddressService);
+  shippingService = inject(ShippingService);
   langService = inject(LanguageService);
   authService = inject(AuthService);
   fb = inject(FormBuilder);
@@ -24,6 +26,7 @@ export class AddressesComponent implements OnInit {
   cartService = inject(CartService);
 
   addresses = signal<Address[]>([]);
+  cities = signal<CityShipping[]>([]);
   isLoading = signal(true);
   isSubmitting = signal(false);
   showModal = signal(false);
@@ -39,6 +42,14 @@ export class AddressesComponent implements OnInit {
 
   ngOnInit() {
     this.loadAddresses();
+    this.loadCities();
+  }
+
+  loadCities() {
+    this.shippingService.getAllCityPrices().subscribe({
+      next: (data) => this.cities.set(data),
+      error: () => console.error('Failed to load cities')
+    });
   }
 
   loadAddresses() {

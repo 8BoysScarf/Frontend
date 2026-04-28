@@ -61,13 +61,55 @@
     </header>
 
     <div class="p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <!-- Stats Overview -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-500 transition-colors">
+            {{ langService.t('admin.stats.products') }}</p>
+          <p class="text-3xl font-black text-slate-900 tracking-tighter">{{ products().length }}</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-500 transition-colors">
+            {{ langService.t('admin.stats.orders') }}</p>
+          <p class="text-3xl font-black text-slate-900 tracking-tighter">{{ ordersTotal() }}</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-500 transition-colors">
+            {{ langService.t('admin.stats.reviews') }}</p>
+          <p class="text-3xl font-black text-slate-900 tracking-tighter">{{ reviewsCount() }}</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-500 transition-colors">
+            {{ langService.t('admin.stats.customers') }}</p>
+          <p class="text-3xl font-black text-slate-900 tracking-tighter">{{ usersCount() }}</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-md transition-all group">
+          <p
+            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-500 transition-colors">
+            {{ langService.t('admin.stats.shipping') }}</p>
+          <p class="text-3xl font-black text-slate-900 tracking-tighter">{{ shippingCitiesCount() }}</p>
+        </div>
+      </div>
+
       @if (activeTab === 'products') {
       <!-- Filtration Bar -->
       <div class="flex flex-col sm:flex-row gap-4 mb-6 animate-fade-in-up">
         <div class="flex-1">
           <div class="relative">
             <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
             </div>
             <input type="text" (input)="searchQuery.set($any($event.target).value)" [value]="searchQuery()"
               class="w-full ps-11 pe-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all shadow-sm"
@@ -79,7 +121,7 @@
             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all shadow-sm">
             <option value="">{{ langService.t('admin.header.allCategories') || 'All Categories' }}</option>
             @for (cat of categories(); track cat.id) {
-              <option [value]="cat.name">{{ cat.name }}</option>
+            <option [value]="cat.name">{{ cat.name }}</option>
             }
           </select>
         </div>
@@ -378,27 +420,539 @@
   }
 </div>
 }
-
 @if (activeTab === 'orders') {
-<div class="flex flex-col items-center justify-center py-20 text-center">
-  <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 mb-4">
-    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-    </svg>
+<div
+  class="bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden shadow-2xl shadow-slate-200/30 animate-fade-in-up">
+  <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+    <h2 class="text-sm font-black text-slate-900 uppercase tracking-widest">{{ langService.t('admin.sidebar.orders') }}
+    </h2>
+    <select (change)="ordersStatusFilter.set($any($event.target).value); ordersPage.set(1); loadOrders()"
+      class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all cursor-pointer">
+      <option value="">{{ langService.t('admin.header.allStatus') || 'All Statuses' }}</option>
+      <option value="Pending">Pending</option>
+      <option value="Shipping">Shipping</option>
+      <option value="Delivered">Delivered</option>
+    </select>
   </div>
-  <h3 class="text-xl font-bold text-slate-900">{{ langService.t('admin.header.ordersTitle') }}</h3>
-  <p class="text-slate-500 mt-2">{{ langService.t('admin.header.ordersDesc') }}</p>
+
+  <!-- Orders Mobile Cards -->
+  <div class="lg:hidden divide-y divide-slate-100">
+    @for (order of ordersList(); track order.id) {
+    <div class="p-5 hover:bg-slate-50/50 transition-all">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ langService.t('orders.orderId')
+            }}</p>
+          <h3 class="text-lg font-black text-slate-900">#{{ order.id }}</h3>
+        </div>
+        <div class="flex flex-col items-end">
+          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ langService.t('cart.total') }}</p>
+          <span class="text-lg font-black text-slate-900 tracking-tighter">${{ order.totalAmount + order.shippingPrice }}</span>
+          <p class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+            {{ langService.t('cart.shipping') }}: ${{ order.shippingPrice }}
+          </p>
+          <div class="flex items-center gap-1.5 mt-1.5">
+            <div class="w-1.5 h-1.5 rounded-full" [class.bg-amber-400]="order.status === 'Pending'"
+              [class.bg-indigo-400]="order.status === 'Shipping'" [class.bg-emerald-400]="order.status === 'Delivered'">
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-widest"
+              [class.text-amber-600]="order.status === 'Pending'" [class.text-indigo-600]="order.status === 'Shipping'"
+              [class.text-emerald-600]="order.status === 'Delivered'">
+              {{ order.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <select (change)="onUpdateOrderStatus(order.id, +$any($event.target).value)"
+          class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all">
+          <option value="" disabled selected>{{ langService.t('admin.header.status') }}</option>
+          <option value="0">Pending</option>
+          <option value="1">Shipping</option>
+          <option value="2">Delivered</option>
+        </select>
+        <button (click)="viewOrderDetails(order.id)"
+          class="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/20 active:scale-95 transition-all">
+          {{ langService.t('wishlist.view') }}
+        </button>
+      </div>
+    </div>
+    } @empty {
+    <div class="p-12 text-center">
+      <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{{ langService.t('orders.emptyTitle') }}
+      </p>
+    </div>
+    }
+  </div>
+
+  <!-- Orders Desktop Table -->
+  <div class="hidden lg:block overflow-x-auto">
+    <table class="w-full text-start border-collapse">
+      <thead>
+        <tr class="bg-slate-50/50 border-b border-slate-100">
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('orders.orderId') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('cart.shipping') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('cart.total') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('admin.header.status') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-end">{{
+            langService.t('admin.header.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        @for (order of ordersList(); track order.id) {
+        <tr class="hover:bg-slate-50/80 transition-all duration-300 group">
+          <td class="px-8 py-6">
+            <span class="font-black text-slate-900 tracking-tight">#{{ order.id }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <span class="text-sm font-bold text-slate-500">${{ order.shippingPrice }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <span class="text-lg font-black text-slate-900 tracking-tighter">${{ order.totalAmount + order.shippingPrice }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full" [class.bg-amber-400]="order.status === 'Pending'"
+                [class.bg-indigo-400]="order.status === 'Shipping'"
+                [class.bg-emerald-400]="order.status === 'Delivered'"></div>
+              <span class="text-[10px] font-black uppercase tracking-widest"
+                [class.text-amber-600]="order.status === 'Pending'"
+                [class.text-indigo-600]="order.status === 'Shipping'"
+                [class.text-emerald-600]="order.status === 'Delivered'">
+                {{ order.status }}
+              </span>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex justify-end gap-2">
+              <select (change)="onUpdateOrderStatus(order.id, +$any($event.target).value)"
+                class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all cursor-pointer">
+                <option value="" disabled selected>{{ langService.t('admin.header.status') }}</option>
+                <option value="0">Pending</option>
+                <option value="1">Shipping</option>
+                <option value="2">Delivered</option>
+              </select>
+              <button (click)="viewOrderDetails(order.id)"
+                class="w-10 h-10 flex items-center justify-center bg-slate-100 text-slate-400 hover:text-indigo-600 rounded-xl transition-all shadow-sm"
+                title="View Details">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="5" class="px-8 py-20 text-center">
+            <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{{
+              langService.t('orders.emptyTitle') }}</p>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="p-6 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center">
+    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total: {{ ordersTotal() }}</p>
+    <div class="flex gap-2">
+      <button [disabled]="ordersPage() === 1" (click)="ordersPage.set(ordersPage() - 1); loadOrders()"
+        class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-[10px] font-black uppercase tracking-widest disabled:opacity-50 hover:bg-slate-50 transition-all shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div class="flex items-center px-4 bg-indigo-600 text-white rounded-xl text-[10px] font-black">
+        {{ ordersPage() }}
+      </div>
+      <button [disabled]="ordersList().length < 20" (click)="ordersPage.set(ordersPage() + 1); loadOrders()"
+        class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-[10px] font-black uppercase tracking-widest disabled:opacity-50 hover:bg-slate-50 transition-all shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
 }
+
+@if (activeTab === 'reviews') {
+<!-- Reviews Mobile Cards (hidden on lg+) -->
+<div class="lg:hidden space-y-4 p-4">
+  @for (review of reviews(); track review.id) {
+  <div
+    class="bg-white rounded-3xl border border-slate-200/60 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+    <div class="flex justify-between items-start mb-4">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black text-lg shadow-inner shrink-0">
+          {{ (review.userName || 'U')[0].toUpperCase() }}
+        </div>
+        <div class="min-w-0">
+          <h4 class="font-black text-slate-900 leading-none truncate">{{ review.userName || 'Anonymous' }}</h4>
+          <div class="flex text-amber-400 mt-1.5">
+            @for (star of [1,2,3,4,5]; track star) {
+            <svg class="w-2.5 h-2.5" [class.text-amber-400]="star <= review.rating"
+              [class.text-slate-200]="star > review.rating" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            }
+          </div>
+        </div>
+      </div>
+      <button (click)="onDeleteReview(review.id)" class="p-2 text-slate-300 hover:text-rose-500 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="bg-slate-50 rounded-2xl p-4 mb-4 border border-slate-100">
+      <p class="text-sm text-slate-600 italic leading-relaxed">"{{ review.comment }}"</p>
+    </div>
+
+    <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 overflow-hidden shrink-0">
+          <img [src]="'https://placehold.co/40x40?text=P' + review.productId" class="w-full h-full object-cover">
+        </div>
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[120px]">{{
+          review.productName || '#' + review.productId }}</span>
+      </div>
+      <button [routerLink]="['/product', review.productId]"
+        class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-indigo-100">
+        {{ langService.t('wishlist.view') }}
+      </button>
+    </div>
+  </div>
+  } @empty {
+  <div class="text-center py-20 bg-white rounded-3xl border border-slate-200/60">
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{{ langService.t('reviews.empty') }}</p>
+  </div>
+  }
+</div>
+
+<!-- Reviews Desktop Table (hidden on mobile) -->
+<div
+  class="hidden lg:block bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden shadow-2xl shadow-slate-200/30">
+  <div class="overflow-x-auto">
+    <table class="w-full text-start border-collapse">
+      <thead>
+        <tr class="bg-slate-50/50 border-b border-slate-100">
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('reviews.product') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('reviews.user') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('reviews.rating') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('reviews.comment') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-end">{{
+            langService.t('admin.header.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        @for (review of reviews(); track review.id) {
+        <tr class="hover:bg-slate-50/80 transition-all duration-300 group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
+                <img [src]="'https://placehold.co/40x40?text=P' + review.productId" class="w-full h-full object-cover">
+              </div>
+              <div class="min-w-0">
+                <p class="font-black text-slate-900 text-sm truncate max-w-[150px]">{{ review.productName || '#' +
+                  review.productId }}</p>
+                <button [routerLink]="['/product', review.productId]"
+                  class="text-[9px] font-black text-indigo-500 uppercase tracking-widest hover:underline">View
+                  Product</button>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black text-[10px]">
+                {{ (review.userName || 'U')[0].toUpperCase() }}
+              </div>
+              <span class="font-bold text-slate-700 text-sm">{{ review.userName || review.userId }}</span>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex gap-0.5">
+              @for (star of [1,2,3,4,5]; track star) {
+              <svg class="w-4 h-4" [class.text-amber-400]="star <= review.rating"
+                [class.text-slate-200]="star > review.rating" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              }
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm text-slate-600 line-clamp-2 max-w-xs">{{ review.comment }}</p>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex justify-end gap-3">
+              <button (click)="onDeleteReview(review.id)"
+                class="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 rounded-xl transition-all duration-300 shadow-sm"
+                title="Delete Review">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                  </path>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="5" class="px-8 py-20 text-center">
+            <div
+              class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{{ langService.t('reviews.empty')
+              }}</p>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+}
+
+@if (activeTab === 'users') {
+<div
+  class="bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden shadow-2xl shadow-slate-200/30 animate-fade-in-up">
+  <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+    <h2 class="text-sm font-black text-slate-900 uppercase tracking-widest">{{ langService.t('admin.sidebar.users') ||
+      'User Management' }}</h2>
+    <div
+      class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+      Total Users: {{ users().length }}
+    </div>
+  </div>
+
+  <!-- Users Mobile Cards -->
+  <div class="lg:hidden divide-y divide-slate-100">
+    @for (user of users(); track user.id) {
+    <div class="p-5 hover:bg-slate-50/50 transition-all">
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-500 font-black text-lg shadow-inner">
+          {{ (user.name || user.userName || 'U')[0].toUpperCase() }}
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-base font-black text-slate-900 truncate">{{ user.name || user.userName }}</h3>
+          <p class="text-[10px] font-bold text-slate-400 truncate">{{ user.email }}</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <select (change)="onChangeUserRole(user.id, $any($event.target).value)"
+          class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all">
+          <option value="" disabled selected>Change Role</option>
+          <option value="Admin">Admin</option>
+          <option value="Customer">Customer</option>
+        </select>
+        <button (click)="onDeleteUser(user.id)"
+          class="w-10 h-10 flex items-center justify-center bg-rose-50 text-rose-500 border border-rose-100 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    } @empty {
+    <div class="p-12 text-center">
+      <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No users found.</p>
+    </div>
+    }
+  </div>
+
+  <!-- Users Desktop Table -->
+  <div class="hidden lg:block overflow-x-auto">
+    <table class="w-full text-start border-collapse">
+      <thead>
+        <tr class="bg-slate-50/50 border-b border-slate-100">
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">Identity
+          </th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">Email</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">Roles</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        @for (user of users(); track user.id) {
+        <tr class="hover:bg-slate-50/80 transition-all duration-300 group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black text-sm border border-slate-200">
+                {{ (user.name || user.userName || 'U')[0].toUpperCase() }}
+              </div>
+              <div>
+                <h4 class="font-black text-slate-900 leading-none">{{ user.name || user.userName }}</h4>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">ID: #{{
+                  user.id.substring(0,8) }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="text-sm font-medium text-slate-600">{{ user.email }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <select (change)="onChangeUserRole(user.id, $any($event.target).value)"
+              class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all cursor-pointer">
+              <option value="" disabled selected>Update Role</option>
+              <option value="Admin">Admin</option>
+              <option value="User">User</option>
+              <option value="Customer">Customer</option>
+            </select>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex justify-end">
+              <button (click)="onDeleteUser(user.id)"
+                class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 text-slate-300 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 rounded-xl transition-all duration-300 shadow-sm"
+                title="Delete User">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="4" class="px-8 py-20 text-center">
+            <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No users registered in the system.
+            </p>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+}
+
+@if (activeTab === 'shipping') {
+<div
+  class="bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden shadow-2xl shadow-slate-200/30 animate-fade-in-up">
+  <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+    <div class="flex items-center gap-4">
+      <h2 class="text-sm font-black text-slate-900 uppercase tracking-widest">{{
+        langService.t('admin.header.shipping.title') }}</h2>
+      <div
+        class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+        {{ langService.t('admin.header.shipping.configured') }}: {{ shippingCitiesCount() }}
+      </div>
+    </div>
+    <button (click)="showAddShippingModal = true"
+      class="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2 group">
+      <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      {{ langService.t('admin.header.shipping.add') || 'Add City' }}
+    </button>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-start border-collapse">
+      <thead>
+        <tr class="bg-slate-50/50 border-b border-slate-100">
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('admin.header.shipping.cityName') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('admin.header.shipping.currentRate') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-start">{{
+            langService.t('admin.header.shipping.newRate') }}</th>
+          <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-end">{{
+            langService.t('admin.header.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        @for (item of cityShippings(); track item.id) {
+        <tr class="hover:bg-slate-50/80 transition-all duration-300 group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black text-sm border border-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-black text-slate-900 leading-none">{{ item.city }}</h4>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="text-lg font-black text-slate-900 tracking-tighter">${{ item.price }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <div class="relative w-32">
+              <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 font-black text-xs">$</span>
+              <input #priceInput type="number" [value]="item.price"
+                class="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all shadow-sm">
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <div class="flex justify-end gap-2">
+              <button (click)="onUpdateShippingPrice(item.city, priceInput)"
+                class="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/20 active:scale-95 transition-all hover:bg-indigo-600">
+                {{ langService.t('admin.header.shipping.update') }}
+              </button>
+              <button (click)="onDeleteCity(item.id)"
+                class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 text-slate-300 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 rounded-xl transition-all duration-300 shadow-sm"
+                title="Delete City">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+}
+
 </div>
 </main>
 
 <!-- Modals -->
-@if (showAddModal || showAddCategoryModal || showAddColorModal || showAddBadgeModal) {
+@if (showAddModal || showAddCategoryModal || showAddColorModal || showAddBadgeModal || showAddShippingModal) {
 <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-    (click)="showAddModal = showAddCategoryModal = showAddColorModal = showAddBadgeModal = false"></div>
+    (click)="showAddModal = showAddCategoryModal = showAddColorModal = showAddBadgeModal = showAddShippingModal = false">
+  </div>
 
   <div
     class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-zoom-in max-h-[90vh] flex flex-col">
@@ -409,11 +963,13 @@
           @else if (showAddCategoryModal) { {{ langService.t('admin.header.createCategory') }} }
           @else if (showAddColorModal) { {{ langService.t('admin.header.addColor') }} }
           @else if (showAddBadgeModal) { {{ langService.t('admin.header.addBadge') }} }
+          @else if (showAddShippingModal) { {{ langService.t('admin.header.shipping.add') }} }
         </h2>
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{{
           langService.t('admin.header.adminPanel') }}</p>
       </div>
-      <button (click)="showAddModal = showAddCategoryModal = showAddColorModal = showAddBadgeModal = false"
+      <button
+        (click)="showAddModal = showAddCategoryModal = showAddColorModal = showAddBadgeModal = showAddShippingModal = false"
         class="text-slate-400 hover:text-slate-900 transition-colors p-2">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -628,6 +1184,29 @@
         </button>
       </form>
       }
+
+      @if (showAddShippingModal) {
+      <form [formGroup]="shippingForm" (ngSubmit)="onAddShipping()" class="space-y-6">
+        <div class="grid grid-cols-1 gap-5">
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{
+              langService.t('admin.header.shipping.cityName') }}</label>
+            <input type="text" formControlName="city" placeholder="City Name"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{{
+              langService.t('admin.header.shipping.currentRate') }}</label>
+            <input type="number" formControlName="price"
+              class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 outline-none bg-slate-50/50">
+          </div>
+        </div>
+        <button type="submit" [disabled]="shippingForm.invalid || isLoading"
+          class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 transition-all">
+          {{ langService.t('admin.header.shipping.add') || 'Add Shipping Zone' }}
+        </button>
+      </form>
+      }
     </div>
   </div>
 </div>
@@ -691,6 +1270,15 @@
 </div>
 }
 </div>
+
+
+  <!-- Order Details Modal -->
+  <app-order-details-modal
+    [isOpen]="showOrderDetailsModal"
+    [isLoading]="isOrderLoading"
+    [order]="selectedOrderDetails()"
+    (close)="showOrderDetailsModal = false">
+  </app-order-details-modal>
 
 <style>
   @keyframes fade-in {

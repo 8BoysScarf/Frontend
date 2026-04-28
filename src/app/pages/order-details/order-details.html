@@ -16,13 +16,45 @@
           <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ langService.t('orders.orderId') }}</p>
           <h2 class="text-3xl font-black text-slate-900">#{{ order()!.id }}</h2>
         </div>
-        <div class="text-sm">
-          <div class="mb-4">
+        <div class="flex items-center gap-4">
+          <div class="text-end">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ langService.t('admin.header.status') }}</p>
+            <span class="px-4 py-1.5 rounded-full text-xs font-bold border uppercase tracking-widest block"
+              [ngClass]="getStatusClass(order()!.status)">
+              {{ order()!.status }}
+            </span>
+          </div>
+          <div class="text-end">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ langService.t('cart.total') }}</p>
-            <p class="text-2xl font-black text-indigo-600">${{ order()!.totalAmount }}</p>
+            <p class="text-2xl font-black text-indigo-600">${{ order()!.totalAmount + order()!.shippingPrice }}</p>
           </div>
         </div>
       </div>
+
+      <!-- Customer Details (Admin Only) -->
+      @if (authService.currentUser()?.roles?.includes('Admin') && order()?.customerName) {
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm animate-fade-in-up">
+        <div class="flex items-center gap-6">
+          <div class="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+            @if (order()?.customerProfile) {
+              <img [src]="order()!.customerProfile" class="w-full h-full object-cover">
+            } @else {
+              <span class="text-2xl font-black text-indigo-400 uppercase">{{ order()!.customerName![0] }}</span>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Order Placed By</p>
+            <h3 class="text-xl font-black text-slate-900 truncate">{{ order()!.customerName }}</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Customer ID: <span class="text-slate-900">#{{ order()!.customerId }}</span></p>
+          </div>
+          <div class="hidden sm:block">
+            <button class="bg-slate-50 text-slate-900 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all border border-slate-200">
+              View Profile
+            </button>
+          </div>
+        </div>
+      </div>
+      }
 
       <!-- Items List -->
       <div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
@@ -58,11 +90,17 @@
             </div>
             <div class="flex justify-between text-slate-600 text-sm">
               <span>{{ langService.t('cart.shipping') }}</span>
-              <span class="font-bold text-emerald-600">{{ langService.t('cart.free') }}</span>
+              <span class="font-bold text-emerald-600">
+                @if (order()!.shippingPrice > 0) {
+                  ${{ order()!.shippingPrice }}
+                } @else {
+                  {{ langService.t('cart.free') }}
+                }
+              </span>
             </div>
             <div class="flex justify-between text-xl border-t border-slate-200 pt-3">
               <span class="font-black text-slate-900 uppercase tracking-tighter">{{ langService.t('cart.total') }}</span>
-              <span class="font-black text-indigo-600">${{ order()!.totalAmount }}</span>
+              <span class="font-black text-indigo-600">${{ order()!.totalAmount + order()!.shippingPrice }}</span>
             </div>
           </div>
         </div>
